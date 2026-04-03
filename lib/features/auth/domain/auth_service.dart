@@ -1,4 +1,9 @@
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:lushi_app/core/exceptions/app_exception.dart';
+import 'package:lushi_app/core/storage/secure_storage_manager.dart';
+import 'package:lushi_app/core/storage/storage_key.dart';
+import 'package:lushi_app/core/storage/storage_manager.dart';
 import 'package:lushi_app/core/utils/encrypt_utils.dart';
 import 'package:lushi_app/features/auth/data/api/auth_api.dart';
 import 'package:lushi_app/features/auth/data/models/userlogin_request.dart';
@@ -11,12 +16,33 @@ class AuthService {
   ///
   /// 异常处理说明:
   /// - [AppException] - 网络错误或服务器业务错误，包含明确的错误类型和消息
-  Future<String?> login(UserLoginRequest request) async {
+  Future<UserLoginResponse?> login(UserLoginRequest request) async {
     // 直接调用 API，让异常自然向上传递
     request.identifyValue = await EncryptUtils.encrypt(request.identifyValue);
 
     // 拦截器已经统一处理了所有异常
     UserLoginResponse? response = await authApi.login(request);
-    return response?.userId;
+    if (response == null) {
+      Fluttertoast.showToast(
+        msg: "登录失败，请检查密码",
+        toastLength: Toast.LENGTH_SHORT, // 短提示
+        gravity: ToastGravity.CENTER, // 居中显示
+        timeInSecForIosWeb: 1, // iOS/Web 显示时长
+        backgroundColor: Colors.black54, // 背景色
+        textColor: Colors.white, // 文字颜色
+        fontSize: 16.0, // 字体大小
+      );
+      return null;
+    } else {
+      //1.存储 token
+      await SecureStorageManager().write(
+        StorageKey.token,
+        response.token ?? '',
+      );
+      //2.存储用户信息
+      response.token = '';
+      await StorageManager().setJson(StorageKey.userInfo, response.toJson());
+      return response;
+    }
   }
 }

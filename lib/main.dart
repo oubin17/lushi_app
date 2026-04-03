@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:lushi_app/features/auth/presentation/login_or_regist.dart';
+import 'package:lushi_app/core/storage/storage_manager.dart';
 import 'package:lushi_app/features/auth/presentation/welcome.dart';
 
-void main() {
+void main() async {
+  // 确保 Flutter 引擎绑定初始化
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // 1. 初始化普通存储
+  await StorageManager.init();
+
   runApp(const MyApp());
 }
 

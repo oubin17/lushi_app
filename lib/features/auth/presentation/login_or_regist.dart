@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:lushi_app/core/constants/images/app_images.dart';
+import 'package:lushi_app/core/storage/storage_manager.dart';
 import 'package:lushi_app/core/utils/log_utils.dart';
 import 'package:lushi_app/features/auth/data/models/userlogin_request.dart';
+import 'package:lushi_app/features/auth/data/models/userlogin_response.dart';
 import 'package:lushi_app/features/auth/domain/auth_service.dart';
 import 'package:lushi_app/widgets/appbar/app_bar.dart';
 import 'package:lushi_app/widgets/button/basic_app_button.dart';
@@ -68,13 +70,17 @@ class _InnerLoginPageState extends State<InnerLoginPage> {
   void _login() async {
     if (_formKey.currentState!.validate()) {
       final authService = AuthService();
-      String? userId = await authService.login(
+      final UserLoginResponse? userLoginResponse = await authService.login(
         UserLoginRequest(
           loginId: _emailController.text,
           identifyValue: _passwordController.text,
         ),
       );
-      Log.i('User ID: $userId', tag: 'Auth-Login');
+      // UserLoginResponse? userLoginResponse = StorageManager().getObject(
+      //   'userInfo',
+      //   (json) => UserLoginResponse.fromJson(json),
+      // );
+      Log.i('User Info: $userLoginResponse', tag: 'Auth-Login');
     }
   }
 

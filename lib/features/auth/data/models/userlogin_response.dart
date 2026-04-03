@@ -21,4 +21,7 @@ class UserLoginResponse extends UserEntity {
 
   factory UserLoginResponse.fromJson(Map<String, dynamic> json) =>
       _$UserLoginResponseFromJson(json);
+
+  // 2. 👇 添加这个 toJson 方法
+  Map<String, dynamic> toJson() => _$UserLoginResponseToJson(this);
 }

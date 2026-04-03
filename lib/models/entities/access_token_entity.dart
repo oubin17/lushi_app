@@ -11,4 +11,7 @@ class AccessTokenEntity {
 
   factory AccessTokenEntity.fromJson(Map<String, dynamic> json) =>
       _$AccessTokenEntityFromJson(json);
+
+  // 2. 👇 添加这个 toJson 方法
+  Map<String, dynamic> toJson() => _$AccessTokenEntityToJson(this);
 }

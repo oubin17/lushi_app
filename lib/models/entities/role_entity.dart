@@ -18,4 +18,7 @@ class RoleEntity {
 
   factory RoleEntity.fromJson(Map<String, dynamic> json) =>
       _$RoleEntityFromJson(json);
+
+  // 2. 👇 添加这个 toJson 方法
+  Map<String, dynamic> toJson() => _$RoleEntityToJson(this);
 }

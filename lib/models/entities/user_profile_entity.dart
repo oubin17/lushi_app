@@ -12,4 +12,7 @@ class UserProfileEntity {
 
   factory UserProfileEntity.fromJson(Map<String, dynamic> json) =>
       _$UserProfileEntityFromJson(json);
+
+  // 2. 👇 添加这个 toJson 方法
+  Map<String, dynamic> toJson() => _$UserProfileEntityToJson(this);
 }
