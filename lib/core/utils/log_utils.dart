@@ -1,4 +1,3 @@
-import 'dart:developer' as developer;
 import 'package:flutter/foundation.dart';
 
 /// 日志打印工具类
@@ -22,7 +21,12 @@ class Log {
   }
 
   /// 错误日志 (Error)
-  static void e(String message, {String? tag, dynamic error, StackTrace? stackTrace}) {
+  static void e(
+    String message, {
+    String? tag,
+    dynamic error,
+    StackTrace? stackTrace,
+  }) {
     if (kDebugMode) {
       final fullTag = tag != null ? '[$tag]' : '[$_tag]';
       print('❌ $fullTag [ERROR] $message');
