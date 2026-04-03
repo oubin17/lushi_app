@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:lushi_app/core/constants/base_constants.dart';
+import 'package:lushi_app/core/exceptions/app_exception.dart';
+import 'package:lushi_app/core/network/interceptors/request_response_interceptor.dart';
+import 'package:lushi_app/core/utils/log_utils.dart';
 import 'package:lushi_app/models/response/service_response.dart';
 
 class ApiService {
@@ -30,35 +32,13 @@ class ApiService {
           },
         ),
       ) {
-    // 添加请求拦截器
-    _dio.interceptors.add(
-      InterceptorsWrapper(
-        onRequest: (options, handler) {
-          if (kDebugMode) {
-            print('请求 URL: ${options.uri}');
-            print('请求头：${options.headers}');
-            print('请求体：${options.data}');
-          }
-          return handler.next(options);
-        },
-        onResponse: (response, handler) {
-          if (kDebugMode) {
-            print('响应状态: ${response.statusCode}');
-            print('响应数据: ${response.data}');
-          }
-          return handler.next(response);
-        },
-        onError: (error, handler) {
-          if (kDebugMode) {
-            print('请求错误: ${error.message}');
-            if (error.response != null) {
-              print('错误响应: ${error.response?.data}');
-            }
-          }
-          return handler.next(error);
-        },
-      ),
-    );
+    // 注意：Dio 的 onResponse/onError 是逆序执行的。
+    // 为了让 ErrorInterceptor 能够捕获到 RequestResponseInterceptor 抛出的异常，
+    // ErrorInterceptor 必须先于 RequestResponseInterceptor 被添加到拦截器列表中。
+    // _dio.interceptors.add(ErrorInterceptor());
+    _dio.interceptors.add(RequestResponseInterceptor());
+
+    Log.i('拦截器初始化完毕，当前数量: ${_dio.interceptors.length}', tag: 'ApiService');
   }
 
   // 保留公开构造函数用于测试或特殊场景
@@ -66,30 +46,76 @@ class ApiService {
     return ApiService._internal(baseUrl: baseUrl, customHeaders: customHeaders);
   }
 
+  /// GET 请求
+  /// 支持添加查询参数
   Future<ServiceResponse> get(
     String path, {
     Map<String, dynamic>? queryParameters,
   }) async {
-    return await _dio
-        .get(path, queryParameters: queryParameters)
-        .then((response) => ServiceResponse.fromJson(response.data));
+    try {
+      final response = await _dio.get(path, queryParameters: queryParameters);
+      return ServiceResponse.fromJson(response.data);
+    } on DioException catch (e) {
+      throw _unwrapException(e);
+    }
   }
 
+  /// POST 请求
+  /// 支持添加请求体数据
   Future<ServiceResponse> post(String path, dynamic data) async {
-    return await _dio
-        .post(path, data: data)
-        .then((response) => ServiceResponse.fromJson(response.data));
+    try {
+      final response = await _dio.post(path, data: data);
+      return ServiceResponse.fromJson(response.data);
+    } on DioException catch (e) {
+      throw _unwrapException(e);
+    }
   }
 
+  /// PUT 请求
+  /// 支持添加请求体数据
   Future<ServiceResponse> put(String path, dynamic data) async {
-    return await _dio
-        .put(path, data: data)
-        .then((response) => ServiceResponse.fromJson(response.data));
+    try {
+      final response = await _dio.put(path, data: data);
+      return ServiceResponse.fromJson(response.data);
+    } on DioException catch (e) {
+      throw _unwrapException(e);
+    }
   }
 
+  /// DELETE 请求
+  /// 支持添加路径
   Future<ServiceResponse> delete(String path) async {
-    return await _dio
-        .delete(path)
-        .then((response) => ServiceResponse.fromJson(response.data));
+    try {
+      final response = await _dio.delete(path);
+      return ServiceResponse.fromJson(response.data);
+    } on DioException catch (e) {
+      throw _unwrapException(e);
+    }
+  }
+
+  Future<ServiceResponse> postWithQueryParameters(
+    String path,
+    Map<String, dynamic>? queryParameters,
+    dynamic data,
+  ) async {
+    try {
+      final response = await _dio.post(
+        path,
+        queryParameters: queryParameters,
+        data: data,
+      );
+      return ServiceResponse.fromJson(response.data);
+    } on DioException catch (e) {
+      throw _unwrapException(e);
+    }
+  }
+
+  /// 统一解包异常
+  /// 如果 DioException 的 error 是 AppException，则直接抛出 AppException
+  Exception _unwrapException(DioException e) {
+    if (e.error is AppException) {
+      return e.error as AppException;
+    }
+    return e;
   }
 }

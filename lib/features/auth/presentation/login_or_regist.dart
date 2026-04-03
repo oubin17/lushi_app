@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lushi_app/core/utils/log_utils.dart';
 import 'package:lushi_app/features/auth/domain/auth_service.dart';
 
 class LoginOrRegist extends StatelessWidget {
@@ -8,7 +9,7 @@ class LoginOrRegist extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo1',
+      title: 'Flutter Demo',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -67,8 +68,10 @@ class _MyHomePageState extends State<MyHomePage> {
   void _login() async {
     // 直接使用单例
     final authService = AuthService();
-    String userId = await authService.login('user@example.com', 'password');
-    print('User ID: $userId');
+    String password =
+        'LAVeSZeyMXMTAu2e0aUJj3fa3j9QmTL9qBq5k9Nqq8i4eSPlk2Pq/7TCDNs3PyxOGsAQNsW3wbH51YDRlyn0whTxGgaeAPoOfW0/udazC8Kcmvg/n9a0NrcE7f+gHQyv1McndWT2q44On8fbJCd7BFQpu5iRxpzJg1mtWgJ7lwIDC6xj5L7Vtx+L1JaC2QdAfBEoxID/AcYuh86XfXiF+hOCt09D5wtUxPQLeMXsP+e7ypOq4Z04ReaQKz0fezaqbXbD79jy6dPMurexNf9ikKkY+8xFUcsHgg1b/w1pM2NVZa54Oiqaz09OPG289UAQnYRJ8rsRwKIhBXUskLxeJw==';
+    String? userId = await authService.login('110', password);
+    Log.i('User ID: $userId', tag: 'Auth-Login');
   }
 
   @override

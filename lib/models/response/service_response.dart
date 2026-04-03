@@ -1,9 +1,23 @@
+import 'package:json_annotation/json_annotation.dart';
 import 'package:lushi_app/models/response/base_response.dart';
 
-class ServiceResponse<T> extends BaseResponse {
-  T? data;
-  ServiceResponse({required super.success, required this.data});
-  ServiceResponse.fromJson(Map<String, dynamic> json) : super.fromJson(json) {
-    data = json['data'];
-  }
+part 'service_response.g.dart';
+
+@JsonSerializable()
+class ServiceResponse extends BaseResponse {
+  dynamic data;
+
+  ServiceResponse({
+    required super.success,
+    this.data,
+    super.errorType,
+    super.errorCode,
+    super.errorContext,
+  });
+
+  factory ServiceResponse.fromJson(Map<String, dynamic> json) =>
+      _$ServiceResponseFromJson(json);
+
+  @override
+  Map<String, dynamic> toJson() => _$ServiceResponseToJson(this);
 }

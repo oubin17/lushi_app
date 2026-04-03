@@ -1,3 +1,8 @@
+import 'package:json_annotation/json_annotation.dart';
+
+part 'role_entity.g.dart';
+
+@JsonSerializable()
 class RoleEntity {
   String id;
   String roleCode;
@@ -10,10 +15,7 @@ class RoleEntity {
     required this.roleName,
     required this.status,
   });
-  factory RoleEntity.fromJson(Map<String, dynamic> json) => RoleEntity(
-    id: json['id'],
-    roleCode: json['roleCode'],
-    roleName: json['roleName'],
-    status: json['status'],
-  );
+
+  factory RoleEntity.fromJson(Map<String, dynamic> json) =>
+      _$RoleEntityFromJson(json);
 }

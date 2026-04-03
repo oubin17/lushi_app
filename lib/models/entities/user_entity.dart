@@ -1,13 +1,17 @@
+import 'package:json_annotation/json_annotation.dart';
 import 'package:lushi_app/models/entities/access_token_entity.dart';
 import 'package:lushi_app/models/entities/role_entity.dart';
 import 'package:lushi_app/models/entities/user_profile_entity.dart';
 
+part 'user_entity.g.dart';
+
+@JsonSerializable()
 class UserEntity {
   String userId;
   String userType;
   String userStatus;
   AccessTokenEntity accessToken;
-  RoleEntity? roles;
+  List<RoleEntity>? roles;
   UserProfileEntity? userProfile;
 
   UserEntity({
@@ -19,14 +23,6 @@ class UserEntity {
     this.userProfile,
   });
 
-  factory UserEntity.fromJson(Map<String, dynamic> json) => UserEntity(
-    userId: json['userId'],
-    userType: json['userType'],
-    userStatus: json['userStatus'],
-    accessToken: AccessTokenEntity.fromJson(json['accessToken']),
-    roles: json['roles'] != null ? RoleEntity.fromJson(json['roles']) : null,
-    userProfile: json['userProfile'] != null
-        ? UserProfileEntity.fromJson(json['userProfile'])
-        : null,
-  );
+  factory UserEntity.fromJson(Map<String, dynamic> json) =>
+      _$UserEntityFromJson(json);
 }
