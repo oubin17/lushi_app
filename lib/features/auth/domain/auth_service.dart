@@ -41,8 +41,28 @@ class AuthService {
       );
       //2.存储用户信息
       response.token = '';
+      //3.判断是否是管理员
+      final adminRole = response.roles?.firstWhere(
+        (element) => element.roleCode == "ADMIN",
+      );
+      response.isAdmin = adminRole != null ? "true" : "false";
       await StorageManager().setJson(StorageKey.userInfo, response.toJson());
       return response;
     }
+  }
+
+  /// 登录方法，返回用户 ID
+  ///
+  /// 异常处理说明:
+  /// - [AppException] - 网络错误或服务器业务错误，包含明确的错误类型和消息
+  Future<void> logout() async {
+    // 拦截器已经统一处理了所有异常
+    await authApi.logout();
+    //1.删除 token
+    await SecureStorageManager().delete(StorageKey.token);
+    //2.删除用户信息
+    // await StorageManager().remove(StorageKey.userInfo);
+    //3.删除本地缓存
+    await StorageManager().clear();
   }
 }

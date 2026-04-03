@@ -1,10 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:lushi_app/core/constants/base_constants.dart';
-import 'package:lushi_app/core/constants/system/system_constants.dart';
 import 'package:lushi_app/core/exceptions/app_exception.dart';
 import 'package:lushi_app/core/network/interceptors/request_response_interceptor.dart';
-import 'package:lushi_app/core/storage/secure_storage_manager.dart';
-import 'package:lushi_app/core/storage/storage_key.dart';
 import 'package:lushi_app/core/utils/log_utils.dart';
 import 'package:lushi_app/models/response/service_response.dart';
 
@@ -30,18 +27,12 @@ class ApiService {
           receiveTimeout: const Duration(seconds: 30),
           // 自动合并公共请求头和自定义请求头
           headers: {
-            SystemConstants.tokenHeader: SecureStorageManager().read(
-              StorageKey.token,
-            ),
             ...BaseConstants.commonHeaders,
             if (customHeaders != null) ...customHeaders,
           },
         ),
       ) {
     // 注意：Dio 的 onResponse/onError 是逆序执行的。
-    // 为了让 ErrorInterceptor 能够捕获到 RequestResponseInterceptor 抛出的异常，
-    // ErrorInterceptor 必须先于 RequestResponseInterceptor 被添加到拦截器列表中。
-    // _dio.interceptors.add(ErrorInterceptor());
     _dio.interceptors.add(RequestResponseInterceptor());
 
     Log.i('拦截器初始化完毕，当前数量: ${_dio.interceptors.length}', tag: 'ApiService');

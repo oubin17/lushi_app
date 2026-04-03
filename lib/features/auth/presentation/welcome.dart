@@ -37,7 +37,7 @@ class Welcome extends StatelessWidget {
                 const Spacer(),
                 BasicAppButton(
                   onPressed: () {
-                    Navigator.pushReplacement(
+                    Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (BuildContext context) =>

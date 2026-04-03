@@ -26,4 +26,12 @@ class AuthApi {
       rethrow;
     }
   }
+
+  Future<void> logout() async {
+    try {
+      await _apiService.post('/user/logout', {});
+    } catch (e, stackTrace) {
+      Log.e('🚨 [AuthApi] 登出失败: $e, $stackTrace');
+    }
+  }
 }

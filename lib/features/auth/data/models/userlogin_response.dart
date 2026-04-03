@@ -9,6 +9,8 @@ part 'userlogin_response.g.dart';
 @JsonSerializable()
 class UserLoginResponse extends UserEntity {
   String? token;
+
+  String? isAdmin;
   UserLoginResponse({
     this.token,
     required super.userId,

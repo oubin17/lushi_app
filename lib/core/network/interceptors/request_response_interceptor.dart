@@ -1,14 +1,31 @@
 import 'package:dio/dio.dart';
+import 'package:lushi_app/core/constants/system/system_constants.dart';
+import 'package:lushi_app/core/storage/secure_storage_manager.dart';
+import 'package:lushi_app/core/storage/storage_key.dart';
 import 'package:lushi_app/core/utils/log_utils.dart';
 
 class RequestResponseInterceptor extends InterceptorsWrapper {
   @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+  void onRequest(
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
     // Log.i(
     //   '${options.method} ${options.uri} ${options.data}',
     //   tag: 'Network-REQ',
     // );
-    Log.i('${options.method} ${options.uri} ', tag: 'Network-REQ');
+    Log.i(
+      '${options.method} ${options.uri} ${options.data} ${options.headers}',
+      tag: 'Network-REQ',
+    );
+
+    // 从安全存储中异步读取 Token
+    final token = await SecureStorageManager().read(StorageKey.token);
+
+    if (token != null && token.isNotEmpty) {
+      // 注入 Token 到请求头
+      options.headers[SystemConstants.tokenHeader] = token;
+    }
     return handler.next(options);
   }
 
@@ -19,7 +36,7 @@ class RequestResponseInterceptor extends InterceptorsWrapper {
     //   tag: 'Network-RES',
     // );
     Log.i(
-      '${response.statusCode} ${response.requestOptions.uri}',
+      '${response.statusCode} ${response.requestOptions.uri} ${response.data}',
       tag: 'Network-RES',
     );
 
