@@ -1,5 +1,6 @@
 import 'package:lushi_app/core/exceptions/app_exception.dart';
 import 'package:lushi_app/features/auth/data/api/auth_api.dart';
+import 'package:lushi_app/features/auth/data/models/userlogin_request.dart';
 import 'package:lushi_app/features/auth/data/models/userlogin_response.dart';
 
 class AuthService {
@@ -9,10 +10,10 @@ class AuthService {
   ///
   /// 异常处理说明:
   /// - [AppException] - 网络错误或服务器业务错误，包含明确的错误类型和消息
-  Future<String?> login(String loginId, String password) async {
+  Future<String?> login(UserLoginRequest request) async {
     // 直接调用 API，让异常自然向上传递
     // 拦截器已经统一处理了所有异常
-    UserLoginResponse? response = await authApi.login(loginId, password);
+    UserLoginResponse? response = await authApi.login(request);
     return response?.userId;
   }
 }

@@ -24,14 +24,3 @@ UserLoginResponse _$UserLoginResponseFromJson(Map<String, dynamic> json) =>
               json['userProfile'] as Map<String, dynamic>,
             ),
     );
-
-Map<String, dynamic> _$UserLoginResponseToJson(UserLoginResponse instance) =>
-    <String, dynamic>{
-      'userId': instance.userId,
-      'userType': instance.userType,
-      'userStatus': instance.userStatus,
-      'accessToken': instance.accessToken,
-      'roles': instance.roles,
-      'userProfile': instance.userProfile,
-      'token': instance.token,
-    };

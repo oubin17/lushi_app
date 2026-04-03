@@ -1,0 +1,34 @@
+import 'package:flutter/material.dart';
+
+class BasicAppbar extends StatelessWidget implements PreferredSizeWidget {
+  final Widget? title;
+  const BasicAppbar({this.title, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      title: title ?? const Text(''),
+      leading: IconButton(
+        onPressed: () => {Navigator.pop(context)},
+        icon: Container(
+          height: 50,
+          width: 50,
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.03),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            Icons.arrow_back_ios_new,
+            size: 15,
+            color: const Color.fromARGB(255, 3, 3, 3),
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Size get preferredSize => Size.fromHeight(kToolbarHeight);
+}

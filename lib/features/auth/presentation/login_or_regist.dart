@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:lushi_app/core/constants/images/app_images.dart';
 import 'package:lushi_app/core/utils/log_utils.dart';
+import 'package:lushi_app/features/auth/data/models/userlogin_request.dart';
 import 'package:lushi_app/features/auth/domain/auth_service.dart';
+import 'package:lushi_app/widgets/appbar/app_bar.dart';
+import 'package:lushi_app/widgets/button/basic_app_button.dart';
 
 class LoginOrRegist extends StatelessWidget {
   const LoginOrRegist({super.key});
@@ -8,29 +13,52 @@ class LoginOrRegist extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
+    return Scaffold(
+      appBar: BasicAppbar(
+        title: SvgPicture.asset(AppImages.logoBg, height: 40),
       ),
-      home: const MyHomePage(title: 'Flutter 1Demo Home Page'),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 50.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            _registerText(),
+            SizedBox(height: 20),
+            _emailField(context),
+            SizedBox(height: 20),
+            _passwordField(context),
+            Spacer(),
+            _registerButton(),
+            SizedBox(height: 20),
+          ],
+        ),
+      ),
     );
   }
+}
+
+Widget _registerText() {
+  return Text(
+    "用户登录",
+    style: TextStyle(
+      // color: Colors.white,
+      fontSize: 25,
+      fontWeight: FontWeight.bold,
+    ),
+    textAlign: TextAlign.center,
+  );
+}
+
+Widget _emailField(BuildContext context) {
+  return TextField(decoration: InputDecoration(hintText: '账号'));
+}
+
+Widget _passwordField(BuildContext context) {
+  return TextField(decoration: InputDecoration(hintText: '密码'));
+}
+
+Widget _registerButton() {
+  return BasicAppButton(onPressed: () {}, title: '登录');
 }
 
 class MyHomePage extends StatefulWidget {
@@ -54,23 +82,14 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
-
   void _login() async {
     // 直接使用单例
     final authService = AuthService();
     String password =
         'LAVeSZeyMXMTAu2e0aUJj3fa3j9QmTL9qBq5k9Nqq8i4eSPlk2Pq/7TCDNs3PyxOGsAQNsW3wbH51YDRlyn0whTxGgaeAPoOfW0/udazC8Kcmvg/n9a0NrcE7f+gHQyv1McndWT2q44On8fbJCd7BFQpu5iRxpzJg1mtWgJ7lwIDC6xj5L7Vtx+L1JaC2QdAfBEoxID/AcYuh86XfXiF+hOCt09D5wtUxPQLeMXsP+e7ypOq4Z04ReaQKz0fezaqbXbD79jy6dPMurexNf9ikKkY+8xFUcsHgg1b/w1pM2NVZa54Oiqaz09OPG289UAQnYRJ8rsRwKIhBXUskLxeJw==';
-    String? userId = await authService.login('110', password);
+    String? userId = await authService.login(
+      UserLoginRequest(loginId: '110', identifyValue: password),
+    );
     Log.i('User ID: $userId', tag: 'Auth-Login');
   }
 
@@ -109,7 +128,7 @@ class _MyHomePageState extends State<MyHomePage> {
           // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
           // action in the IDE, or press "p" in the console), to see the
           // wireframe for each widget.
-          mainAxisAlignment: .center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Text('You have pushed the button this many times:'),
             Text(
