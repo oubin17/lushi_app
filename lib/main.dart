@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lushi_app/core/storage/storage_manager.dart';
+import 'package:lushi_app/core/utils/navigator_utils.dart';
 import 'package:lushi_app/features/auth/presentation/welcome.dart';
 
 void main() async {
@@ -18,6 +19,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: NavigatorUtils.navigatorKey,
       debugShowCheckedModeBanner: false,
       // title: '禄仕人力管理系统',
       // theme: ThemeData(
