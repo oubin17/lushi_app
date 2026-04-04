@@ -99,11 +99,12 @@ class _InnerLoginPageState extends State<InnerLoginPage> {
       );
       if (userLoginResponse != null) {
         // 登录成功，导航到首页
-        Navigator.pushReplacement(
+        Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(
             builder: (BuildContext context) => const HomePage(),
           ),
+          (Route<dynamic> route) => false,
         );
       }
     }
