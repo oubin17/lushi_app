@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:lushi_app/core/storage/storage_key.dart';
+import 'package:lushi_app/core/storage/storage_manager.dart';
+import 'package:lushi_app/features/auth/data/models/userlogin_response.dart';
 import 'package:lushi_app/features/home/data/models/private_resume.dart';
 import 'package:lushi_app/features/home/data/models/private_resume_status.dart';
 import 'package:lushi_app/features/home/domain/home_resume_service.dart';
@@ -37,17 +40,23 @@ class _PrivateResumeTableWidgetState extends State<PrivateResumeTableWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : privateResumeInfoList?.isEmpty ?? true
-          ? const Center(child: Text('暂无隐私简历信息...'))
-          : _buildTable(),
+    return SingleChildScrollView(
+      child: Container(
+        child: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : privateResumeInfoList?.isEmpty ?? true
+            ? const Center(child: Text('暂无隐私简历信息...'))
+            : _buildTable(),
+      ),
     );
   }
 
   // 3. 构建表格 UI (修改版)
   Widget _buildTable() {
+    UserLoginResponse? user = StorageManager().getObject(
+      StorageKey.userInfo,
+      (json) => UserLoginResponse.fromJson(json),
+    );
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -77,7 +86,7 @@ class _PrivateResumeTableWidgetState extends State<PrivateResumeTableWidget> {
               order.resumeLibraryDTO?.mobile ?? "",
               order.resumeLibraryDTO?.age ?? "",
               PrivateResumeStatus.privateResumeStatusMap[order.status] ?? "",
-              order.userName ?? "",
+              order.userName ?? user?.userProfile?.userName ?? "",
             ], isHeader: false);
           },
         ),
@@ -125,11 +134,11 @@ class _PrivateResumeTableWidgetState extends State<PrivateResumeTableWidget> {
   // 5. 提取单元格内容构建逻辑 (修改版)
   Widget _buildCellContent(String text, bool isHeader) {
     // 状态标签样式处理 (保持不变)
-    if (text == "level_1") return _buildStatusBadge("紧急", Colors.red);
-    if (text == "level_2") return _buildStatusBadge("重要", Colors.orange);
-    if (text == "level_3") return _buildStatusBadge("一般", Colors.blue);
-    if (text == "level_4") return _buildStatusBadge("不重要", Colors.green);
-    if (text == "level_5") return _buildStatusBadge("不紧急", Colors.green);
+    if (text == "面试未通过但有意向") return _buildStatusBadge("紧急", Colors.red);
+    if (text == "有意向") return _buildStatusBadge("重要", Colors.orange);
+    if (text == "面试通过") return _buildStatusBadge("一般", Colors.blue);
+    if (text == "无意向") return _buildStatusBadge("不重要", Colors.green);
+    if (text == "待联系") return _buildStatusBadge("待联系", Colors.green);
 
     // 普通文本样式
     return Padding(
