@@ -20,3 +20,13 @@ UserEntity _$UserEntityFromJson(Map<String, dynamic> json) => UserEntity(
       ? null
       : UserProfileEntity.fromJson(json['userProfile'] as Map<String, dynamic>),
 );
+
+Map<String, dynamic> _$UserEntityToJson(UserEntity instance) =>
+    <String, dynamic>{
+      'userId': instance.userId,
+      'userType': instance.userType,
+      'userStatus': instance.userStatus,
+      'accessToken': instance.accessToken,
+      'roles': instance.roles,
+      'userProfile': instance.userProfile,
+    };

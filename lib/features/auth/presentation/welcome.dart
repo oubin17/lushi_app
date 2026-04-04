@@ -26,26 +26,26 @@ class Welcome extends StatelessWidget {
                 const SizedBox(height: 200),
                 const Center(
                   child: Text(
-                    '禄仕人力管理系统',
+                    '禄仕管理系统',
                     style: TextStyle(
-                      fontSize: 28,
-                      color: Color.fromARGB(255, 127, 144, 235),
+                      fontSize: 30,
+                      color: Color.fromARGB(255, 12, 178, 189),
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
                 const Spacer(),
-                BasicAppButton(
-                  onPressed: () {
+                GestureDetector(
+                  onTap: () {
+                    // 执行跳转
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (BuildContext context) =>
-                            const LoginOrRegist(),
+                        builder: (context) => const LoginOrRegist(),
                       ),
                     );
                   },
-                  title: "登录",
+                  child: const Icon(Icons.login, size: 40, color: Colors.white),
                 ),
                 const SizedBox(height: 20),
               ],

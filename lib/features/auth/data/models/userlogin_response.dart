@@ -13,6 +13,7 @@ class UserLoginResponse extends UserEntity {
   String? isAdmin;
   UserLoginResponse({
     this.token,
+    this.isAdmin,
     required super.userId,
     required super.userType,
     required super.userStatus,

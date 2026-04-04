@@ -6,7 +6,9 @@ class SystemConstants {
   static const String tokenHeader = 'ODK-TOKEN';
 
   // 租户ID
-  static const String tenantId = 'DEFAULT';
+  static const String tenantId = 'ODK-LUSHI';
+
+  // static const String tenantId = 'ODK-LUSHI';
 
   static String get serverIp {
     // iOS 模拟器或真机

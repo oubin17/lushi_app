@@ -3,7 +3,9 @@ import 'package:lushi_app/core/constants/system/system_constants.dart';
 class BaseConstants {
   // 根据平台自动选择正确的 baseUrl
   static String get baseUrl {
-    return 'http://${SystemConstants.serverIp}:8080/odk-base-template/api';
+    return 'http://${SystemConstants.serverIp}:8082/lushi-crm/api';
+
+    // return 'http://${SystemConstants.serverIp}:8080/odk-base-template/api';
 
     // iOS 模拟器或真机
     // if (Platform.isIOS) {

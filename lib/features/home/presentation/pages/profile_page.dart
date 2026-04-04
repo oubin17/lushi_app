@@ -39,7 +39,7 @@ class ProfilePage extends StatelessWidget {
   /// 构建个人信息卡片
   Widget _buildInfoCard(UserLoginResponse user) {
     return Card(
-      elevation: 4, // 阴影高度
+      elevation: 2, // 阴影高度
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ), // 圆角

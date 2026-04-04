@@ -35,26 +35,48 @@ class _InnerLoginPageState extends State<InnerLoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: BasicAppbar(
-        title: SvgPicture.asset(AppImages.logoBg, height: 40),
+        // title: SvgPicture.asset(AppImages.logoBg, height: 80),
+        title: Text(widget.title),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 50.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              _registerText(),
-              const SizedBox(height: 20),
-              _emailField(context),
-              const SizedBox(height: 20),
-              _passwordField(context),
-              const Spacer(),
-              _registerButton(),
-              const SizedBox(height: 20),
-            ],
+      body: Stack(
+        children: [
+          SvgPicture.asset(
+            AppImages.logoBg,
+            width: double.infinity,
+            height: double.infinity,
           ),
-        ),
+          // 背景图片
+          // Image.asset(
+          //   AppImages.authBg,
+          //   fit: BoxFit.cover,
+          //   width: double.infinity,
+          //   height: double.infinity,
+          // ),
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 30.0,
+              vertical: 50.0,
+            ),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // _registerText(),
+                  const SizedBox(height: 20),
+                  _emailField(context),
+                  const SizedBox(height: 20),
+                  _passwordField(context),
+                  const Spacer(),
+                  _registerButton(),
+                  const SizedBox(height: 20),
+                ],
+              ),
+            ),
+          ),
+        ],
+
+        // Container(color: Colors.black.withOpacity(0.3)),
       ),
     );
   }
@@ -99,6 +121,7 @@ class _InnerLoginPageState extends State<InnerLoginPage> {
     return TextFormField(
       controller: _emailController,
       decoration: const InputDecoration(hintText: '账号'),
+      // style: const TextStyle(fontSize: 16),
       validator: (value) {
         if (value == null || value.isEmpty) {
           return '请输入账号';
