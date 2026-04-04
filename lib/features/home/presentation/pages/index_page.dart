@@ -30,8 +30,6 @@ class IndexPage extends StatelessWidget {
               ),
               const Divider(height: 30), // 分割线
               ProjectInfoTableWidget(),
-
-              const Icon(Icons.home, size: 64, color: Colors.blue),
             ],
           ),
         ),

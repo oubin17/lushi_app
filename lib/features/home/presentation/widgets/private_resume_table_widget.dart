@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:lushi_app/features/home/data/models/project_info.dart';
-import 'package:lushi_app/features/home/data/models/project_urgency_level.dart';
+import 'package:lushi_app/features/home/data/models/private_resume.dart';
+import 'package:lushi_app/features/home/data/models/private_resume_status.dart';
 import 'package:lushi_app/features/home/domain/home_resume_service.dart';
 
-class ProjectInfoTableWidget extends StatefulWidget {
-  const ProjectInfoTableWidget({super.key});
+class PrivateResumeTableWidget extends StatefulWidget {
+  const PrivateResumeTableWidget({super.key});
 
   @override
-  State<ProjectInfoTableWidget> createState() => _ProjectInfoTableWidgetState();
+  State<PrivateResumeTableWidget> createState() =>
+      _PrivateResumeTableWidgetState();
 }
 
-class _ProjectInfoTableWidgetState extends State<ProjectInfoTableWidget> {
-  List<ProjectInfo>? projectInfoList;
+class _PrivateResumeTableWidgetState extends State<PrivateResumeTableWidget> {
+  List<PrivateResumeInfo>? privateResumeInfoList;
 
   // 加载状态
   bool _isLoading = true;
@@ -19,16 +20,16 @@ class _ProjectInfoTableWidgetState extends State<ProjectInfoTableWidget> {
   @override
   void initState() {
     super.initState();
-    _getProjectInfo();
+    _getPrivateResumeInfo();
   }
 
-  /// 获取项目列表
-  void _getProjectInfo() async {
+  /// 获取隐私简历列表
+  void _getPrivateResumeInfo() async {
     // 模拟网络延迟
     // await Future.delayed(const Duration(seconds: 1));
 
     // _isLoading = true;
-    projectInfoList = await HomeResumeService().getProjectInfo();
+    privateResumeInfoList = await HomeResumeService().getPrivateResumeInfo();
     _isLoading = false;
 
     setState(() {});
@@ -39,8 +40,8 @@ class _ProjectInfoTableWidgetState extends State<ProjectInfoTableWidget> {
     return Container(
       child: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : projectInfoList?.isEmpty ?? true
-          ? const Center(child: Text('暂无项目信息...'))
+          : privateResumeInfoList?.isEmpty ?? true
+          ? const Center(child: Text('暂无隐私简历信息...'))
           : _buildTable(),
     );
   }
@@ -57,22 +58,26 @@ class _ProjectInfoTableWidgetState extends State<ProjectInfoTableWidget> {
           // 核心：禁用 ListView 自身的滚动，交给外层的 SingleChildScrollView 处理
           physics: const NeverScrollableScrollPhysics(),
           shrinkWrap: true, // 核心：让 ListView 根据内容计算高度
-          itemCount: projectInfoList!.length + 1, // 数量 = 数据量 + 1个表头
+          itemCount: privateResumeInfoList!.length + 1, // 数量 = 数据量 + 1个表头
           itemBuilder: (context, index) {
             // 第一行渲染表头
             if (index == 0) {
-              return _buildListRow(["项目名称", "公司", "人数", "紧急"], isHeader: true);
+              return _buildListRow([
+                "姓名",
+                "手机号",
+                "年龄",
+                "状态",
+                "员工",
+              ], isHeader: true);
             }
             // 其余行渲染数据 (注意 index - 1 因为第0个是表头)
-            final order = projectInfoList![index - 1];
+            final order = privateResumeInfoList![index - 1];
             return _buildListRow([
-              order.projectName,
-              order.company,
-              order.headCount.toString(),
-              ProjectUrgencyLevelExtension.fromValue(
-                    int.parse(order.urgencyLevel),
-                  )?.name ??
-                  "",
+              order.resumeLibraryDTO?.name ?? "",
+              order.resumeLibraryDTO?.mobile ?? "",
+              order.resumeLibraryDTO?.age ?? "",
+              PrivateResumeStatus.privateResumeStatusMap[order.status] ?? "",
+              order.userName ?? "",
             ], isHeader: false);
           },
         ),
@@ -85,7 +90,7 @@ class _ProjectInfoTableWidgetState extends State<ProjectInfoTableWidget> {
     return Container(
       decoration: BoxDecoration(
         color: isHeader
-            ? Colors.blueGrey[50]
+            ? const Color.fromARGB(255, 102, 145, 239)
             : (cells.hashCode.isEven ? Colors.grey[50] : Colors.grey[200]),
         border: Border(
           bottom: BorderSide(color: Colors.grey[200]!, width: 0.5),
@@ -97,13 +102,13 @@ class _ProjectInfoTableWidgetState extends State<ProjectInfoTableWidget> {
         children: cells.map((text) {
           double flex;
           if (cells.indexOf(text) == 0) {
-            flex = 2;
+            flex = 1;
           } else if (cells.indexOf(text) == 1)
             // ignore: curly_braces_in_flow_control_structures
-            flex = 1.5;
+            flex = 2;
           else if (cells.indexOf(text) == 2)
             // ignore: curly_braces_in_flow_control_structures
-            flex = 0.5;
+            flex = 1;
           else
             // ignore: curly_braces_in_flow_control_structures
             flex = 1;

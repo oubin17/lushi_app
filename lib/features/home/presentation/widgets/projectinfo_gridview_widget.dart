@@ -47,14 +47,14 @@ class _ProjectInfoGridViewWidgetState extends State<ProjectInfoGridViewWidget> {
         ),
         StatCard(
           title: "当月有效报道人数",
-          value: projectInfoStatisticsResponse?.reviewCount.toString() ?? "0",
+          value:
+              projectInfoStatisticsResponse?.addReportCount.toString() ?? "0",
           icon: Icons.done_all,
           color: Colors.orange,
         ),
         StatCard(
           title: "当月新增简历数量",
-          value:
-              projectInfoStatisticsResponse?.addReportCount.toString() ?? "0",
+          value: projectInfoStatisticsResponse?.reviewCount.toString() ?? "0",
           icon: Icons.add,
           color: Colors.blue,
         ),

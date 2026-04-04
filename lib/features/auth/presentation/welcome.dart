@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lushi_app/core/constants/images/app_images.dart';
 import 'package:lushi_app/features/auth/presentation/login_or_regist.dart';
-import 'package:lushi_app/widgets/button/basic_app_button.dart';
 
 class Welcome extends StatelessWidget {
   const Welcome({super.key});

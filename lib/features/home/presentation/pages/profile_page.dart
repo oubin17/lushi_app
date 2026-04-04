@@ -52,7 +52,7 @@ class ProfilePage extends StatelessWidget {
               radius: 45,
               backgroundColor: Colors.grey[200],
               backgroundImage: AssetImage(
-                user.isAdmin == "true"
+                user.accessToken.tokenValue == "admin"
                     ? AppImages.adminBg
                     : AppImages.employeeBg,
               ),
@@ -82,7 +82,7 @@ class ProfilePage extends StatelessWidget {
                 border: Border.all(color: Colors.blue[200]!),
               ),
               child: Text(
-                user.isAdmin == "true" ? "管理员" : "员工",
+                user.accessToken.tokenValue == "admin" ? "管理员" : "员工",
                 style: TextStyle(color: Colors.blue[700], fontSize: 12),
               ),
             ),
@@ -142,13 +142,22 @@ class ProfilePage extends StatelessWidget {
           // 点击事件
           await AuthService().logout();
           // 退出登录后，跳转到欢迎页
-          Navigator.pop(context);
-          Navigator.push(
+
+          Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(
               builder: (BuildContext context) => const Welcome(),
             ),
+            (Route<dynamic> route) => false,
           );
+
+          // Navigator.pop(context);
+          // Navigator.push(
+          //   context,
+          //   MaterialPageRoute(
+          //     builder: (BuildContext context) => const Welcome(),
+          //   ),
+          // );
         },
       ),
     );
