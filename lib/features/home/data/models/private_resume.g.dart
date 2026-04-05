@@ -7,16 +7,17 @@ part of 'private_resume.dart';
 // **************************************************************************
 
 PrivateResumeInfo _$PrivateResumeInfoFromJson(Map<String, dynamic> json) =>
-    PrivateResumeInfo()
-      ..remark = json['remark'] as String?
-      ..status = json['status'] as String?
-      ..company = json['company'] as String?
-      ..userName = json['userName'] as String?
-      ..resumeLibraryDTO = json['resumeLibraryDTO'] == null
+    PrivateResumeInfo(
+      remark: json['remark'] as String?,
+      status: json['status'] as String?,
+      company: json['company'] as String?,
+      userName: json['userName'] as String?,
+      resumeLibraryDTO: json['resumeLibraryDTO'] == null
           ? null
           : ResumeLibraryInfo.fromJson(
               json['resumeLibraryDTO'] as Map<String, dynamic>,
-            );
+            ),
+    );
 
 Map<String, dynamic> _$PrivateResumeInfoToJson(PrivateResumeInfo instance) =>
     <String, dynamic>{

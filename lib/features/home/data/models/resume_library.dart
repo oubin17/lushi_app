@@ -7,6 +7,11 @@ class ResumeLibraryInfo {
   String? name;
   String? mobile;
   String? age;
+  String? workAddr;
+  String? idNo;
+
+  String? domicile;
+  String? extendInfo;
 
   String? gender;
 
@@ -18,6 +23,10 @@ class ResumeLibraryInfo {
     this.age,
     this.gender,
     this.userName,
+    this.domicile,
+    this.extendInfo,
+    this.workAddr,
+    this.idNo,
   });
 
   factory ResumeLibraryInfo.fromJson(Map<String, dynamic> json) =>

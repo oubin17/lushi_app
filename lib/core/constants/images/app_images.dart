@@ -11,4 +11,8 @@ class AppImages {
   static const String employeeBg = '${basePath}auth/employee.jpg';
 
   static const String logoBg = '${vectorPath}logo.svg';
+
+  static const String woman = '${basePath}auth/woman_client.png';
+
+  static const String man = '${basePath}auth/man_client.png';
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lushi_app/core/constants/images/app_images.dart';
 import 'package:lushi_app/core/storage/storage_key.dart';
 import 'package:lushi_app/core/storage/storage_manager.dart';
 import 'package:lushi_app/features/auth/data/models/userlogin_response.dart';
@@ -40,143 +41,204 @@ class _PrivateResumeTableWidgetState extends State<PrivateResumeTableWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Container(
-        child: _isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : privateResumeInfoList?.isEmpty ?? true
-            ? const Center(child: Text('暂无隐私简历信息...'))
-            : _buildTable(),
-      ),
+    return ListView.builder(
+      itemCount: privateResumeInfoList?.length ?? 0,
+      itemBuilder: (context, index) {
+        final privateResumeInfo = privateResumeInfoList![index];
+        return PrivateResumeTableRowWidget(
+          privateResumeInfo: privateResumeInfo,
+        );
+      },
     );
   }
+}
 
-  // 3. 构建表格 UI (修改版)
-  Widget _buildTable() {
+class PrivateResumeTableRowWidget extends StatelessWidget {
+  const PrivateResumeTableRowWidget({
+    super.key,
+    required this.privateResumeInfo,
+  });
+
+  final PrivateResumeInfo privateResumeInfo;
+
+  @override
+  Widget build(BuildContext context) {
     UserLoginResponse? user = StorageManager().getObject(
       StorageKey.userInfo,
       (json) => UserLoginResponse.fromJson(json),
     );
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        // 使用 ListView 替代 Table，支持无限滚动且性能更好
-        child: ListView.builder(
-          // 核心：禁用 ListView 自身的滚动，交给外层的 SingleChildScrollView 处理
-          physics: const NeverScrollableScrollPhysics(),
-          shrinkWrap: true, // 核心：让 ListView 根据内容计算高度
-          itemCount: privateResumeInfoList!.length + 1, // 数量 = 数据量 + 1个表头
-          itemBuilder: (context, index) {
-            // 第一行渲染表头
-            if (index == 0) {
-              return _buildListRow([
-                "姓名",
-                "手机号",
-                "年龄",
-                "状态",
-                "员工",
-              ], isHeader: true);
-            }
-            // 其余行渲染数据 (注意 index - 1 因为第0个是表头)
-            final order = privateResumeInfoList![index - 1];
-            return _buildListRow([
-              order.resumeLibraryDTO?.name ?? "",
-              order.resumeLibraryDTO?.mobile ?? "",
-              order.resumeLibraryDTO?.age ?? "",
-              PrivateResumeStatus.privateResumeStatusMap[order.status] ?? "",
-              order.userName ?? user?.userProfile?.userName ?? "",
-            ], isHeader: false);
-          },
+
+    return ListTile(
+      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      leading: CircleAvatar(
+        radius: 28,
+        backgroundImage: AssetImage(
+          privateResumeInfo.resumeLibraryDTO?.gender == "1"
+              ? AppImages.man
+              : AppImages.woman,
         ),
       ),
-    );
-  }
 
-  // 4. 构建单行 UI
-  Widget _buildListRow(List<String> cells, {required bool isHeader}) {
-    return Container(
-      decoration: BoxDecoration(
-        color: isHeader
-            ? const Color.fromARGB(255, 102, 145, 239)
-            : (cells.hashCode.isEven ? Colors.grey[50] : Colors.grey[200]),
-        border: Border(
-          bottom: BorderSide(color: Colors.grey[200]!, width: 0.5),
-        ),
+      // --- 视觉优化 ---
+      // 让点击时的水波纹变成圆角，且选中时有背景色
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(5),
+        side: BorderSide(color: Colors.grey[200]!), // 底部边框分割线
       ),
-      child: Row(
-        // 关键修改：让行内组件垂直居中对齐（如果是多行文字，这样比较好看）
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: cells.map((text) {
-          double flex;
-          if (cells.indexOf(text) == 0) {
-            flex = 1;
-          } else if (cells.indexOf(text) == 1)
-            // ignore: curly_braces_in_flow_control_structures
-            flex = 2;
-          else if (cells.indexOf(text) == 2)
-            // ignore: curly_braces_in_flow_control_structures
-            flex = 1;
-          else
-            // ignore: curly_braces_in_flow_control_structures
-            flex = 1;
+      selectedTileColor: Colors.blue[50], // 点击或选中时的背景色
 
-          return Expanded(
-            flex: flex.toInt(),
-            child: _buildCellContent(text, isHeader),
-          );
-        }).toList(),
+      title: Text(
+        privateResumeInfo.resumeLibraryDTO?.name ?? '',
+        style: const TextStyle(fontWeight: FontWeight.bold),
       ),
-    );
-  }
-
-  // 5. 提取单元格内容构建逻辑 (修改版)
-  Widget _buildCellContent(String text, bool isHeader) {
-    // 状态标签样式处理 (保持不变)
-    if (text == "面试未通过但有意向") return _buildStatusBadge("紧急", Colors.red);
-    if (text == "有意向") return _buildStatusBadge("重要", Colors.orange);
-    if (text == "面试通过") return _buildStatusBadge("一般", Colors.blue);
-    if (text == "无意向") return _buildStatusBadge("不重要", Colors.green);
-    if (text == "待联系") return _buildStatusBadge("待联系", Colors.green);
-
-    // 普通文本样式
-    return Padding(
-      padding: const EdgeInsets.all(12.0),
-      child: Text(
-        text,
-        style: TextStyle(
-          color: isHeader ? Colors.blueGrey[800] : Colors.black87,
-          fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
-          // 可选：设置行高，防止换行后文字挤在一起
-          height: 1.5,
-        ),
-        // --- 修改点 ---
+      subtitle: Row(
+        children: [
+          Text(
+            privateResumeInfo.resumeLibraryDTO?.mobile ?? '',
+            style: const TextStyle(fontSize: 14),
+          ),
+          const SizedBox(width: 8),
+          user?.accessToken.tokenValue == "admin"
+              ?
+                // 员工名称
+                Text(
+                  "员工："
+                  "${privateResumeInfo.userName ?? ''}",
+                  style: const TextStyle(fontSize: 14, color: Colors.grey),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                )
+              : Container(),
+        ],
       ),
-    );
-  }
-
-  // 5. 状态胶囊组件
-  Widget _buildStatusBadge(String text, Color color) {
-    return Padding(
-      padding: const EdgeInsets.all(6.0),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+      trailing: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(45),
-          border: Border.all(color: color.withOpacity(0.5)),
+          color: const Color.fromARGB(255, 225, 223, 223), // 给状态加个底色
+          borderRadius: BorderRadius.circular(4),
         ),
-        child: Center(
-          child: Text(
-            text,
-            style: TextStyle(
-              color: color,
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
+        child: Text(
+          PrivateResumeStatus.privateResumeStatusMap[privateResumeInfo
+                  .status] ??
+              '',
+          style: TextStyle(
+            fontSize: 12,
+
+            color:
+                // const Color.fromARGB(255, 235, 11, 33),
+                PrivateResumeStatus.privateResumeStatusMap[privateResumeInfo
+                        .status] ==
+                    '有意向'
+                ? const Color.fromARGB(255, 255, 89, 0)
+                : Colors.grey,
           ),
         ),
+      ),
+
+      onTap: () {
+        // 点击事件
+        _showUserDetailDialog(context, privateResumeInfo);
+      },
+    );
+  }
+
+  // 核心方法：显示详情弹窗
+  void _showUserDetailDialog(BuildContext context, PrivateResumeInfo user) {
+    showDialog(
+      context: context,
+      // barrierDismissible: true, // 默认为 true，点击弹窗外部区域即可关闭
+      builder: (BuildContext context) {
+        return AlertDialog(
+          // 1. 标题区域
+          title: Row(
+            children: [
+              const Icon(Icons.account_circle, color: Colors.blue, size: 30),
+              const SizedBox(width: 10),
+              Text(user.resumeLibraryDTO?.name ?? ''),
+            ],
+          ),
+          content: SingleChildScrollView(
+            // 防止内容过多溢出
+            child: ListBody(
+              children: <Widget>[
+                _buildDetailRow(
+                  Icons.phone,
+                  "手机号",
+                  user.resumeLibraryDTO?.mobile ?? '',
+                ),
+                _buildDetailRow(
+                  Icons.person,
+                  "性别",
+                  user.resumeLibraryDTO?.gender == "1" ? "男" : "女",
+                ),
+                _buildDetailRow(
+                  Icons.calendar_today,
+                  "年龄",
+                  user.resumeLibraryDTO?.age ?? '',
+                ),
+                _buildDetailRow(
+                  Icons.perm_identity_outlined,
+                  "身份证号",
+                  user.resumeLibraryDTO?.idNo ?? '',
+                ),
+                _buildDetailRow(
+                  Icons.location_on,
+                  "工作地",
+                  user.resumeLibraryDTO?.workAddr ?? '',
+                ),
+                _buildDetailRow(
+                  Icons.location_on,
+                  "户籍所在地",
+                  user.resumeLibraryDTO?.domicile ?? '',
+                ),
+                _buildDetailRow(
+                  Icons.extension,
+                  "扩展信息",
+                  user.resumeLibraryDTO?.extendInfo ?? '',
+                ),
+                const Divider(),
+                Text(
+                  "状态: ${PrivateResumeStatus.privateResumeStatusMap[user.status] ?? ''}",
+                  style: const TextStyle(
+                    color: Colors.orange,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // 2. 底部按钮区域
+          actions: <Widget>[
+            // TextButton(
+            //   child: const Text("关闭"),
+            //   onPressed: () {
+            //     Navigator.of(context).pop(); // 关闭弹窗
+            //   },
+            // ),
+            // TextButton(
+            //   child: const Text("编辑", style: TextStyle(color: Colors.blue)),
+            //   onPressed: () {
+            //     Navigator.of(context).pop();
+            //     // 这里可以跳转编辑页面
+            //   },
+            // ),
+          ],
+        );
+      },
+    );
+  }
+
+  // 辅助方法：构建详情行
+  Widget _buildDetailRow(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        children: [
+          Icon(icon, size: 20, color: Colors.grey),
+          const SizedBox(width: 10),
+          Text("$label: ", style: const TextStyle(fontWeight: FontWeight.bold)),
+          Expanded(child: Text(value)),
+        ],
       ),
     );
   }
