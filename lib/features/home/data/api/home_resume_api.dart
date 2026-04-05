@@ -70,7 +70,7 @@ class HomeResumeApi {
     try {
       PageRequest pageRequest = PageRequest.withValues(
         page: 0,
-        size: 50,
+        size: 500,
         sortField: 'in_time',
         sortDirection: 'DESC',
       );
