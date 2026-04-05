@@ -121,7 +121,10 @@ class _InnerLoginPageState extends State<InnerLoginPage> {
   Widget _emailField(BuildContext context) {
     return TextFormField(
       controller: _emailController,
-      decoration: const InputDecoration(hintText: '账号'),
+      decoration: const InputDecoration(
+        prefixIcon: Icon(Icons.app_registration),
+        labelText: '账号',
+      ),
       // style: const TextStyle(fontSize: 16),
       validator: (value) {
         if (value == null || value.isEmpty) {
@@ -135,7 +138,10 @@ class _InnerLoginPageState extends State<InnerLoginPage> {
   Widget _passwordField(BuildContext context) {
     return TextFormField(
       controller: _passwordController,
-      decoration: const InputDecoration(hintText: '密码'),
+      decoration: const InputDecoration(
+        labelText: '密码',
+        prefixIcon: Icon(Icons.password),
+      ),
       obscureText: true,
       validator: (value) {
         if (value == null || value.isEmpty) {

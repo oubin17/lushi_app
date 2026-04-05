@@ -12,7 +12,6 @@ ResumeLibraryInfo _$ResumeLibraryInfoFromJson(Map<String, dynamic> json) =>
       mobile: json['mobile'] as String?,
       age: json['age'] as String?,
       gender: json['gender'] as String?,
-      userName: json['userName'] as String?,
       domicile: json['domicile'] as String?,
       extendInfo: json['extendInfo'] as String?,
       workAddr: json['workAddr'] as String?,
@@ -29,5 +28,4 @@ Map<String, dynamic> _$ResumeLibraryInfoToJson(ResumeLibraryInfo instance) =>
       'domicile': instance.domicile,
       'extendInfo': instance.extendInfo,
       'gender': instance.gender,
-      'userName': instance.userName,
     };

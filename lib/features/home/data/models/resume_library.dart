@@ -15,14 +15,11 @@ class ResumeLibraryInfo {
 
   String? gender;
 
-  String? userName;
-
   ResumeLibraryInfo({
     this.name,
     this.mobile,
     this.age,
     this.gender,
-    this.userName,
     this.domicile,
     this.extendInfo,
     this.workAddr,

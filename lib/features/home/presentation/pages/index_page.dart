@@ -79,7 +79,10 @@ class _IndexPageState extends State<IndexPage> {
               child: Container(
                 padding: const EdgeInsets.all(16.0), // 将 Padding 移入这里
                 alignment: Alignment.centerLeft,
-                child: const Text('指标列表', style: TextStyle(fontSize: 20)),
+                child: const Text(
+                  '指标列表',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
               ),
             ),
             // 2. 分割线
@@ -98,13 +101,12 @@ class _IndexPageState extends State<IndexPage> {
             // 4. 项目列表标题
             SliverToBoxAdapter(
               child: Container(
-                padding: const EdgeInsets.only(
-                  top: 16.0,
-                  left: 16.0,
-                  right: 16.0,
-                ),
+                padding: const EdgeInsets.all(16),
                 alignment: Alignment.centerLeft,
-                child: const Text('项目列表', style: TextStyle(fontSize: 20)),
+                child: const Text(
+                  '项目列表',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
               ),
             ),
             // 5. 分割线

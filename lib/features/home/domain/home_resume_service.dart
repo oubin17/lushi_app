@@ -2,6 +2,7 @@ import 'package:lushi_app/features/home/data/api/home_resume_api.dart';
 import 'package:lushi_app/features/home/data/models/private_resume.dart';
 import 'package:lushi_app/features/home/data/models/project_info.dart';
 import 'package:lushi_app/features/home/data/models/projectinfo_statistics_response.dart';
+import 'package:lushi_app/features/home/data/models/resume_library.dart';
 
 class HomeResumeService {
   final HomeResumeApi homeResumeApi = HomeResumeApi();
@@ -19,5 +20,10 @@ class HomeResumeService {
   /// 获取隐私简历列表
   Future<List<PrivateResumeInfo>> getPrivateResumeInfo() async {
     return await homeResumeApi.getPrivateResumeInfo();
+  }
+
+  /// 添加隐私简历
+  Future<dynamic> privateResumeAdd(ResumeLibraryInfo resumeLibraryInfo) async {
+    return await homeResumeApi.privateResumeAdd(resumeLibraryInfo);
   }
 }

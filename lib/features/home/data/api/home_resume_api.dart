@@ -93,4 +93,22 @@ class HomeResumeApi {
       rethrow;
     }
   }
+
+  /// 添加隐私简历
+  Future<dynamic> privateResumeAdd(ResumeLibraryInfo resumeLibraryInfo) async {
+    try {
+      ServiceResponse response = await _apiService.post(
+        '/resume/private/add',
+        resumeLibraryInfo.toJson(),
+      );
+      if (response.success) {
+        return true;
+      } else {
+        return response.errorContext;
+      }
+    } catch (e, stackTrace) {
+      Log.e('🚨 [HomeResumeApi] 添加隐私简历失败: $e, $stackTrace');
+      rethrow;
+    }
+  }
 }

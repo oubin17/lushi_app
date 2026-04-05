@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lushi_app/features/home/presentation/pages/index_page.dart';
 import 'package:lushi_app/features/home/presentation/pages/private_resume_page.dart';
 import 'package:lushi_app/features/home/presentation/pages/profile_page.dart';
-import 'package:lushi_app/features/home/presentation/pages/search_page.dart';
+import 'package:lushi_app/features/home/presentation/pages/resume_library.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -17,7 +17,7 @@ class _HomePageState extends State<HomePage> {
   final List<Widget> _pages = [
     const IndexPage(),
     const PrivateResumePage(),
-    // const SearchPage(),
+    const ResumeLibraryPage(),
     const ProfilePage(),
   ];
 
@@ -47,7 +47,10 @@ class _HomePageState extends State<HomePage> {
             icon: Icon(Icons.private_connectivity),
             label: '私有库',
           ),
-          // const BottomNavigationBarItem(icon: Icon(Icons.search), label: '搜索'),
+          const BottomNavigationBarItem(
+            icon: Icon(Icons.library_books),
+            label: '简历库',
+          ),
           const BottomNavigationBarItem(icon: Icon(Icons.person), label: '我的'),
         ],
       ),
