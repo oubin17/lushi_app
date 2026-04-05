@@ -21,34 +21,67 @@ class _PrivateResumeTableWidgetState extends State<PrivateResumeTableWidget> {
   // 加载状态
   bool _isLoading = true;
 
+  // 1. 添加一个 ScrollController (可选，但推荐用于复杂列表)
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
     _getPrivateResumeInfo();
   }
 
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   /// 获取隐私简历列表
-  void _getPrivateResumeInfo() async {
+  Future<void> _getPrivateResumeInfo() async {
     // 模拟网络延迟
-    // await Future.delayed(const Duration(seconds: 1));
+    await Future.delayed(const Duration(seconds: 1));
 
-    // _isLoading = true;
-    privateResumeInfoList = await HomeResumeService().getPrivateResumeInfo();
-    _isLoading = false;
+    try {
+      // 这里调用你的 Service
+      privateResumeInfoList = await HomeResumeService().getPrivateResumeInfo();
+    } catch (e) {
+      // 处理错误
+    } finally {
+      // 无论成功失败，都结束加载状态
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
-    setState(() {});
+  /// 下拉刷新触发的方法
+  Future<void> _onRefresh() async {
+    // 重置状态
+    setState(() {
+      _isLoading = true;
+    });
+    // 重新获取数据
+    await _getPrivateResumeInfo();
   }
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: privateResumeInfoList?.length ?? 0,
-      itemBuilder: (context, index) {
-        final privateResumeInfo = privateResumeInfoList![index];
-        return PrivateResumeTableRowWidget(
-          privateResumeInfo: privateResumeInfo,
-        );
-      },
+    return RefreshIndicator(
+      onRefresh: _onRefresh,
+      child: _isLoading && (privateResumeInfoList?.isEmpty ?? true)
+          ? const Center(child: CircularProgressIndicator()) // 首次加载时的空状态
+          : ListView.builder(
+              controller: _scrollController, // 绑定控制器
+              itemCount: privateResumeInfoList?.length ?? 0,
+              itemBuilder: (context, index) {
+                final privateResumeInfo = privateResumeInfoList![index];
+                return PrivateResumeTableRowWidget(
+                  privateResumeInfo: privateResumeInfo,
+                );
+              },
+            ),
     );
   }
 }

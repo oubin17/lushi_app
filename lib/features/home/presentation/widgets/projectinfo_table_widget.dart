@@ -1,45 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:lushi_app/features/home/data/models/project_info.dart';
 import 'package:lushi_app/features/home/data/models/project_urgency_level.dart';
-import 'package:lushi_app/features/home/domain/home_resume_service.dart';
 
 class ProjectInfoTableWidget extends StatefulWidget {
-  const ProjectInfoTableWidget({super.key});
+  final List<ProjectInfo>? projectInfoList;
+  const ProjectInfoTableWidget({super.key, this.projectInfoList});
 
   @override
   State<ProjectInfoTableWidget> createState() => _ProjectInfoTableWidgetState();
 }
 
 class _ProjectInfoTableWidgetState extends State<ProjectInfoTableWidget> {
-  List<ProjectInfo>? projectInfoList;
-
-  // 加载状态
-  bool _isLoading = true;
-
   @override
   void initState() {
     super.initState();
-    _getProjectInfo();
-  }
-
-  /// 获取项目列表
-  void _getProjectInfo() async {
-    // 模拟网络延迟
-    // await Future.delayed(const Duration(seconds: 1));
-
-    // _isLoading = true;
-    projectInfoList = await HomeResumeService().getProjectInfo();
-    _isLoading = false;
-
-    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : projectInfoList?.isEmpty ?? true
+      child: widget.projectInfoList?.isEmpty ?? true
           ? const Center(child: Text('暂无项目信息...'))
           : _buildTable(),
     );
@@ -57,14 +37,14 @@ class _ProjectInfoTableWidgetState extends State<ProjectInfoTableWidget> {
           // 核心：禁用 ListView 自身的滚动，交给外层的 SingleChildScrollView 处理
           physics: const NeverScrollableScrollPhysics(),
           shrinkWrap: true, // 核心：让 ListView 根据内容计算高度
-          itemCount: projectInfoList!.length + 1, // 数量 = 数据量 + 1个表头
+          itemCount: widget.projectInfoList!.length + 1, // 数量 = 数据量 + 1个表头
           itemBuilder: (context, index) {
             // 第一行渲染表头
             if (index == 0) {
               return _buildListRow(["项目名称", "公司", "人数", "紧急"], isHeader: true);
             }
             // 其余行渲染数据 (注意 index - 1 因为第0个是表头)
-            final order = projectInfoList![index - 1];
+            final order = widget.projectInfoList![index - 1];
             return _buildListRow([
               order.projectName,
               order.company,

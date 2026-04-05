@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:lushi_app/features/home/data/models/projectinfo_statistics_response.dart';
-import 'package:lushi_app/features/home/domain/home_resume_service.dart';
 
 class ProjectInfoGridViewWidget extends StatefulWidget {
-  const ProjectInfoGridViewWidget({super.key});
+  /// 项目统计信息
+  final ProjectInfoStatisticsResponse? projectInfoStatisticsResponse;
+  const ProjectInfoGridViewWidget({
+    super.key,
+    this.projectInfoStatisticsResponse,
+  });
 
   @override
   State<ProjectInfoGridViewWidget> createState() =>
@@ -11,27 +15,18 @@ class ProjectInfoGridViewWidget extends StatefulWidget {
 }
 
 class _ProjectInfoGridViewWidgetState extends State<ProjectInfoGridViewWidget> {
-  /// 项目统计信息
-  ProjectInfoStatisticsResponse? projectInfoStatisticsResponse;
-
   @override
   void initState() {
     super.initState();
-    getProjectInfoStatistics();
-  }
-
-  /// 获取项目统计信息
-  Future<void> getProjectInfoStatistics() async {
-    projectInfoStatisticsResponse = await HomeResumeService()
-        .getProjectInfoStatistics();
-    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return // 使用 GridView 实现 2x2 布局
     GridView.count(
+      // 关键配置：允许在父级滚动视图中计算高度
       shrinkWrap: true,
+      // 关键配置：禁用自身滚动，交给外层处理
       physics: const NeverScrollableScrollPhysics(),
       crossAxisCount: 2,
       crossAxisSpacing: 12,
@@ -41,27 +36,34 @@ class _ProjectInfoGridViewWidgetState extends State<ProjectInfoGridViewWidget> {
         StatCard(
           title: "年度有效报道人数",
           value:
-              projectInfoStatisticsResponse?.validReportCount.toString() ?? "0",
+              widget.projectInfoStatisticsResponse?.validReportCount
+                  .toString() ??
+              "0",
           icon: Icons.date_range,
           color: Colors.green,
         ),
         StatCard(
           title: "当月有效报道人数",
           value:
-              projectInfoStatisticsResponse?.addReportCount.toString() ?? "0",
+              widget.projectInfoStatisticsResponse?.addReportCount.toString() ??
+              "0",
           icon: Icons.done_all,
           color: Colors.orange,
         ),
         StatCard(
           title: "当月新增简历数量",
-          value: projectInfoStatisticsResponse?.reviewCount.toString() ?? "0",
+          value:
+              widget.projectInfoStatisticsResponse?.reviewCount.toString() ??
+              "0",
           icon: Icons.add,
           color: Colors.blue,
         ),
         StatCard(
           title: "当日新增简历数量",
           value:
-              projectInfoStatisticsResponse?.todayReviewCount.toString() ?? "0",
+              widget.projectInfoStatisticsResponse?.todayReviewCount
+                  .toString() ??
+              "0",
           icon: Icons.favorite,
           color: Colors.red,
         ),
