@@ -19,37 +19,49 @@ class _IndexPageState extends State<IndexPage> {
   List<ProjectInfo>? _projectInfoList;
 
   @override
-  void initState() async {
+  void initState() {
     super.initState();
 
-    _projectInfoStatisticsResponse = await _getProjectInfoStatistics();
-    _projectInfoList = await _getProjectInfo();
+    _loadAllData();
   }
 
-  /// 获取项目列表
-  Future<List<ProjectInfo>> _getProjectInfo() async {
-    return await HomeResumeService().getProjectInfo();
-  }
+  // 加载状态（可选，用于显示加载中）
+  bool _isLoading = true;
 
-  /// 获取项目统计信息
-  Future<ProjectInfoStatisticsResponse> _getProjectInfoStatistics() async {
-    return await HomeResumeService().getProjectInfoStatistics();
+  // 2. 封装一个统一加载数据的方法
+  Future<void> _loadAllData() async {
+    // 可以在这里设置加载状态
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      // 3. 使用 await 等待数据返回，然后再赋值给变量
+      final stats = await HomeResumeService().getProjectInfoStatistics();
+      final list = await HomeResumeService().getProjectInfo();
+
+      // 4. 数据回来后，更新状态
+      if (mounted) {
+        setState(() {
+          _projectInfoStatisticsResponse = stats;
+          _projectInfoList = list;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      // 处理错误
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   // 刷新回调方法
   Future<void> _onRefresh() async {
-    // 模拟网络请求延迟 2 秒
-    await Future.delayed(const Duration(seconds: 1));
-
     // 在这里调用你的数据刷新逻辑
-    _projectInfoStatisticsResponse = await _getProjectInfoStatistics();
-    _projectInfoList = await _getProjectInfo();
-    // await HomeResumeService().refreshData();
-
-    // 结束刷新
-    if (mounted) {
-      setState(() {});
-    }
+    await _loadAllData();
   }
 
   @override
