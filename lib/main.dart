@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:lushi_app/core/storage/storage_manager.dart';
 import 'package:lushi_app/core/utils/navigator_utils.dart';
 import 'package:lushi_app/features/auth/presentation/welcome.dart';
+import 'package:lushi_app/features/provider/data/model/counter_model.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   // 确保 Flutter 引擎绑定初始化
@@ -10,7 +12,12 @@ void main() async {
   // 1. 初始化普通存储
   await StorageManager.init();
 
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [ChangeNotifierProvider(create: (context) => CounterModel())],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
