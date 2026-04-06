@@ -2,6 +2,13 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+//    await StorageManager().setJson(StorageKey.userInfo, response.toJson());
+
+//    // UserLoginResponse? user = StorageManager().getObject(
+//   StorageKey.userInfo,
+//   (json) => UserLoginResponse.fromJson(json),
+// );
+
 class StorageManager {
   static final StorageManager _instance = StorageManager._internal();
 

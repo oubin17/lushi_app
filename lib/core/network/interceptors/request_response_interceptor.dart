@@ -1,12 +1,11 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 import 'package:lushi_app/core/constants/system/system_constants.dart';
 import 'package:lushi_app/core/storage/secure_storage_manager.dart';
 import 'package:lushi_app/core/storage/storage_key.dart';
-import 'package:lushi_app/core/storage/storage_manager.dart';
 import 'package:lushi_app/core/utils/log_utils.dart';
 import 'package:lushi_app/core/utils/navigator_utils.dart';
-import 'package:lushi_app/features/auth/presentation/welcome.dart';
+import 'package:lushi_app/features/auth/domain/auth_service.dart';
+import 'package:lushi_app/features/splash/presentation/splash.dart';
 
 class RequestResponseInterceptor extends InterceptorsWrapper {
   @override
@@ -76,19 +75,10 @@ class RequestResponseInterceptor extends InterceptorsWrapper {
       final errorCode = data['errorCode'];
       if (tokenExpiredCodes.contains(errorCode)) {
         // 1. 清除本地存储
-        _handleLogout();
+        AuthService().afterLogout();
         // 2. 跳转欢迎页
-        NavigatorUtils.pushReplacementWelcome(const Welcome());
+        NavigatorUtils.pushReplacementPage(const SplashPage());
       }
     }
   }
-}
-
-/// 处理 Token 过期后的登出逻辑
-void _handleLogout() {
-  // 删除 Token
-  SecureStorageManager().delete(StorageKey.token);
-  // 清除所有普通存储（用户信息等）
-  StorageManager().clear();
-  Log.w('检测到 Token 过期，已执行本地登出清空', tag: 'Auth-Logout');
 }

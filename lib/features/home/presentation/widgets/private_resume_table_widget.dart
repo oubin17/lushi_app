@@ -1,11 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:lushi_app/core/constants/images/app_images.dart';
+import 'package:lushi_app/core/storage/secure_storage_manager.dart';
 import 'package:lushi_app/core/storage/storage_key.dart';
-import 'package:lushi_app/core/storage/storage_manager.dart';
-import 'package:lushi_app/features/auth/data/models/userlogin_response.dart';
+import 'package:lushi_app/core/utils/log_utils.dart';
 import 'package:lushi_app/features/home/data/models/private_resume.dart';
 import 'package:lushi_app/features/home/data/models/private_resume_status.dart';
 import 'package:lushi_app/features/home/domain/home_resume_service.dart';
+import 'package:lushi_app/models/entities/user_entity.dart';
 
 class PrivateResumeTableWidget extends StatefulWidget {
   const PrivateResumeTableWidget({super.key});
@@ -18,6 +21,8 @@ class PrivateResumeTableWidget extends StatefulWidget {
 class _PrivateResumeTableWidgetState extends State<PrivateResumeTableWidget> {
   List<PrivateResumeInfo>? privateResumeInfoList;
 
+  UserEntity? _user;
+
   // 加载状态
   bool _isLoading = true;
 
@@ -28,6 +33,7 @@ class _PrivateResumeTableWidgetState extends State<PrivateResumeTableWidget> {
   void initState() {
     super.initState();
     _getPrivateResumeInfo();
+    _loadData();
   }
 
   @override
@@ -56,6 +62,20 @@ class _PrivateResumeTableWidgetState extends State<PrivateResumeTableWidget> {
     }
   }
 
+  Future<void> _loadData() async {
+    try {
+      final String? userInfo = await SecureStorageManager().read(
+        StorageKey.userInfo,
+      );
+      _user = UserEntity.fromJson(jsonDecode(userInfo!));
+      // 数据加载完成后更新 UI
+      setState(() {});
+    } catch (e) {
+      // 错误处理
+      Log.e('读取用户信息失败: $e');
+    }
+  }
+
   /// 下拉刷新触发的方法
   Future<void> _onRefresh() async {
     // 重置状态
@@ -78,6 +98,7 @@ class _PrivateResumeTableWidgetState extends State<PrivateResumeTableWidget> {
               itemBuilder: (context, index) {
                 final privateResumeInfo = privateResumeInfoList![index];
                 return PrivateResumeTableRowWidget(
+                  user: _user,
                   privateResumeInfo: privateResumeInfo,
                 );
               },
@@ -89,18 +110,15 @@ class _PrivateResumeTableWidgetState extends State<PrivateResumeTableWidget> {
 class PrivateResumeTableRowWidget extends StatelessWidget {
   const PrivateResumeTableRowWidget({
     super.key,
+    required this.user,
     required this.privateResumeInfo,
   });
 
+  final UserEntity? user;
   final PrivateResumeInfo privateResumeInfo;
 
   @override
   Widget build(BuildContext context) {
-    UserLoginResponse? user = StorageManager().getObject(
-      StorageKey.userInfo,
-      (json) => UserLoginResponse.fromJson(json),
-    );
-
     return ListTile(
       contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       leading: CircleAvatar(
@@ -131,7 +149,7 @@ class PrivateResumeTableRowWidget extends StatelessWidget {
             style: const TextStyle(fontSize: 14),
           ),
           const SizedBox(width: 8),
-          user?.accessToken.tokenValue == "admin"
+          user?.isAdmin == true
               ?
                 // 员工名称
                 Text(

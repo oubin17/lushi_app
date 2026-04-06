@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:lushi_app/core/constants/images/app_images.dart';
 import 'package:lushi_app/features/auth/data/models/userlogin_request.dart';
-import 'package:lushi_app/features/auth/data/models/userlogin_response.dart';
 import 'package:lushi_app/features/auth/domain/auth_service.dart';
 import 'package:lushi_app/features/home/presentation/home.dart';
+import 'package:lushi_app/models/entities/user_entity.dart';
 import 'package:lushi_app/widgets/appbar/app_bar.dart';
 import 'package:lushi_app/widgets/button/basic_app_button.dart';
 
-class LoginOrRegist extends StatelessWidget {
-  const LoginOrRegist({super.key});
+class LoginOrRegistPage extends StatelessWidget {
+  const LoginOrRegistPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -90,13 +90,13 @@ class _InnerLoginPageState extends State<InnerLoginPage> {
 
   void _login() async {
     if (_formKey.currentState!.validate()) {
-      final UserLoginResponse? userLoginResponse = await AuthService().login(
+      final UserEntity? userEntity = await AuthService().login(
         UserLoginRequest(
           loginId: _emailController.text,
           identifyValue: _passwordController.text,
         ),
       );
-      if (userLoginResponse != null) {
+      if (userEntity != null) {
         // 登录成功，导航到首页
         Navigator.pushAndRemoveUntil(
           context,

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lushi_app/core/storage/storage_manager.dart';
 import 'package:lushi_app/core/utils/navigator_utils.dart';
-import 'package:lushi_app/features/auth/presentation/welcome.dart';
 import 'package:lushi_app/features/provider/data/model/counter_model.dart';
+import 'package:lushi_app/features/splash/presentation/splash.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
       //   colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       //   useMaterial3: true,
       // ),
-      home: const Welcome(),
+      home: const SplashPage(),
     );
   }
 }

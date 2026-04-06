@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:lushi_app/core/exceptions/app_exception.dart';
@@ -8,6 +10,7 @@ import 'package:lushi_app/core/utils/encrypt_utils.dart';
 import 'package:lushi_app/features/auth/data/api/auth_api.dart';
 import 'package:lushi_app/features/auth/data/models/userlogin_request.dart';
 import 'package:lushi_app/features/auth/data/models/userlogin_response.dart';
+import 'package:lushi_app/models/entities/user_entity.dart';
 
 class AuthService {
   static final AuthService _instance = AuthService._internal();
@@ -18,7 +21,7 @@ class AuthService {
   ///
   /// 异常处理说明:
   /// - [AppException] - 网络错误或服务器业务错误，包含明确的错误类型和消息
-  Future<UserLoginResponse?> login(UserLoginRequest request) async {
+  Future<UserEntity?> login(UserLoginRequest request) async {
     // 直接调用 API，让异常自然向上传递
     request.identifyValue = await EncryptUtils.encrypt(request.identifyValue);
 
@@ -42,14 +45,14 @@ class AuthService {
         response.token ?? '',
       );
       //2.存储用户信息
-      response.token = '';
-      //3.判断是否是管理员
-      final adminRole = response.roles?.firstWhere(
-        (element) => element.roleCode == "ADMIN",
+      UserEntity userEntity = await getUserInfo();
+      await SecureStorageManager().write(
+        StorageKey.userInfo,
+        jsonEncode(userEntity.toJson()),
       );
-      response.isAdmin = adminRole != null ? "true" : "false";
-      await StorageManager().setJson(StorageKey.userInfo, response.toJson());
-      return response;
+
+      // await StorageManager().setJson(StorageKey.userInfo, response.toJson());
+      return userEntity;
     }
   }
 
@@ -60,11 +63,52 @@ class AuthService {
   Future<void> logout() async {
     // 拦截器已经统一处理了所有异常
     await AuthApi().logout();
+
+    await afterLogout();
     //1.删除 token
-    await SecureStorageManager().delete(StorageKey.token);
+    // await SecureStorageManager().deleteAll();
+    // await SecureStorageManager().delete(StorageKey.token);
     //2.删除用户信息
     // await StorageManager().remove(StorageKey.userInfo);
     //3.删除本地缓存
+    // await StorageManager().clear();
+  }
+
+  Future<void> afterLogout() async {
+    await SecureStorageManager().deleteAll();
     await StorageManager().clear();
+  }
+
+  /// 检查用户是否已登录
+  Future<bool> isLoggedIn() async {
+    // 读取加密存储中的 token
+    final token = await SecureStorageManager().read(StorageKey.token);
+    // 不为空且不为空字符串，说明已登录
+    return token != null && token.isNotEmpty;
+  }
+
+  /// 获取本地用户信息
+  Future<UserEntity?> getLocalUserInfo() async {
+    final String? userInfo = await SecureStorageManager().read(
+      StorageKey.userInfo,
+    );
+    if (userInfo == null) {
+      return getUserInfo();
+    } else {
+      return UserEntity.fromJson(jsonDecode(userInfo));
+    }
+  }
+
+  /// 获取用户信息
+  Future<UserEntity> getUserInfo() async {
+    // 拦截器已经统一处理了所有异常
+    UserEntity user = await AuthApi().getUserInfo();
+    //1.存储用户信息
+    await SecureStorageManager().write(
+      StorageKey.userInfo,
+      jsonEncode(user.toJson()),
+    );
+
+    return user;
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class SecureStorageManager {
@@ -35,5 +37,21 @@ class SecureStorageManager {
   /// 清空所有安全数据
   Future<void> deleteAll() async {
     await _storage.deleteAll();
+  }
+
+  Future<T?> getObject<T>(
+    String key,
+    T Function(Map<String, dynamic>) fromJsonFunc,
+  ) async {
+    final jsonString = await read(key);
+    if (jsonString == null) {
+      return null;
+    }
+
+    final Map<String, dynamic> map =
+        jsonDecode(jsonString) as Map<String, dynamic>;
+
+    // 调用传入的转换函数
+    return fromJsonFunc(map);
   }
 }

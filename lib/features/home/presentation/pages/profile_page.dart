@@ -1,20 +1,46 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:lushi_app/core/constants/images/app_images.dart';
+import 'package:lushi_app/core/storage/secure_storage_manager.dart';
 import 'package:lushi_app/core/storage/storage_key.dart';
-import 'package:lushi_app/core/storage/storage_manager.dart';
-import 'package:lushi_app/features/auth/data/models/userlogin_response.dart';
+import 'package:lushi_app/core/utils/log_utils.dart';
 import 'package:lushi_app/features/auth/domain/auth_service.dart';
-import 'package:lushi_app/features/auth/presentation/welcome.dart';
+import 'package:lushi_app/features/splash/presentation/splash.dart';
+import 'package:lushi_app/models/entities/user_entity.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
   @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  UserEntity? _user;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    try {
+      final String? userInfo = await SecureStorageManager().read(
+        StorageKey.userInfo,
+      );
+      _user = UserEntity.fromJson(jsonDecode(userInfo!));
+      // 数据加载完成后更新 UI
+      setState(() {});
+    } catch (e) {
+      // 错误处理
+      Log.e('读取用户信息失败: $e');
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    UserLoginResponse? user = StorageManager().getObject(
-      StorageKey.userInfo,
-      (json) => UserLoginResponse.fromJson(json),
-    );
     return SingleChildScrollView(
       // 使用滚动视图，防止内容过多报错
       padding: const EdgeInsets.all(16.0),
@@ -22,7 +48,7 @@ class ProfilePage extends StatelessWidget {
         children: [
           const SizedBox(height: 16),
           // --- 卡片 1: 个人信息 ---
-          _buildInfoCard(user!),
+          _buildInfoCard(_user!),
 
           const SizedBox(height: 16), // 间距
           // --- 卡片 2: 占位卡片 (待开发) ---
@@ -37,7 +63,7 @@ class ProfilePage extends StatelessWidget {
   }
 
   /// 构建个人信息卡片
-  Widget _buildInfoCard(UserLoginResponse user) {
+  Widget _buildInfoCard(UserEntity user) {
     return Card(
       elevation: 2, // 阴影高度
       shape: RoundedRectangleBorder(
@@ -52,9 +78,7 @@ class ProfilePage extends StatelessWidget {
               radius: 45,
               backgroundColor: Colors.grey[200],
               backgroundImage: AssetImage(
-                user.accessToken.tokenValue == "admin"
-                    ? AppImages.adminBg
-                    : AppImages.employeeBg,
+                user.isAdmin ? AppImages.adminBg : AppImages.employeeBg,
               ),
               // child:
               //     (user.userProfile == null ||
@@ -82,7 +106,7 @@ class ProfilePage extends StatelessWidget {
                 border: Border.all(color: Colors.blue[200]!),
               ),
               child: Text(
-                user.accessToken.tokenValue == "admin" ? "管理员" : "员工",
+                user.isAdmin ? "管理员" : "员工",
                 style: TextStyle(color: Colors.blue[700], fontSize: 12),
               ),
             ),
@@ -146,18 +170,10 @@ class ProfilePage extends StatelessWidget {
           Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(
-              builder: (BuildContext context) => const Welcome(),
+              builder: (BuildContext context) => const SplashPage(),
             ),
             (Route<dynamic> route) => false,
           );
-
-          // Navigator.pop(context);
-          // Navigator.push(
-          //   context,
-          //   MaterialPageRoute(
-          //     builder: (BuildContext context) => const Welcome(),
-          //   ),
-          // );
         },
       ),
     );

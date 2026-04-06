@@ -13,6 +13,7 @@ class UserEntity {
   AccessTokenEntity accessToken;
   List<RoleEntity>? roles;
   UserProfileEntity? userProfile;
+  bool get isAdmin => roles?.any((role) => role.roleCode == 'ADMIN') ?? false;
 
   UserEntity({
     required this.userId,
@@ -25,4 +26,6 @@ class UserEntity {
 
   factory UserEntity.fromJson(Map<String, dynamic> json) =>
       _$UserEntityFromJson(json);
+
+  Map<String, dynamic> toJson() => _$UserEntityToJson(this);
 }

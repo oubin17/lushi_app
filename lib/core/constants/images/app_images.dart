@@ -4,7 +4,7 @@ class AppImages {
   static const String format = '.jpg';
 
   /// 认证背景图片
-  static const String authBg = '${basePath}auth/auth_bg.jpg';
+  static const String splash = '${basePath}splash/splash.jpg';
 
   static const String adminBg = '${basePath}auth/admin.jpg';
 

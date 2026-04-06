@@ -10,10 +10,8 @@ part 'userlogin_response.g.dart';
 class UserLoginResponse extends UserEntity {
   String? token;
 
-  String? isAdmin;
   UserLoginResponse({
     this.token,
-    this.isAdmin,
     required super.userId,
     required super.userType,
     required super.userStatus,

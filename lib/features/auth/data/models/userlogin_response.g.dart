@@ -9,7 +9,6 @@ part of 'userlogin_response.dart';
 UserLoginResponse _$UserLoginResponseFromJson(Map<String, dynamic> json) =>
     UserLoginResponse(
       token: json['token'] as String?,
-      isAdmin: json['isAdmin'] as String?,
       userId: json['userId'] as String,
       userType: json['userType'] as String,
       userStatus: json['userStatus'] as String,
@@ -35,5 +34,4 @@ Map<String, dynamic> _$UserLoginResponseToJson(UserLoginResponse instance) =>
       'roles': instance.roles,
       'userProfile': instance.userProfile,
       'token': instance.token,
-      'isAdmin': instance.isAdmin,
     };
