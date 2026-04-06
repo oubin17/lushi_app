@@ -5,11 +5,15 @@ import 'package:lushi_app/features/auth/data/models/userlogin_response.dart';
 import 'package:lushi_app/models/response/service_response.dart';
 
 class AuthApi {
-  final ApiService _apiService = ApiService.instance;
+  // 单例实例
+  static final AuthApi _instance = AuthApi._internal();
+
+  AuthApi._internal();
+  factory AuthApi() => _instance;
 
   Future<UserLoginResponse?> login(UserLoginRequest request) async {
     try {
-      ServiceResponse response = await _apiService.post('/user/login', {
+      ServiceResponse response = await ApiService().post('/user/login', {
         'loginId': request.loginId,
         'identifyValue': request.identifyValue,
         "loginType": request.loginType,
@@ -29,7 +33,7 @@ class AuthApi {
 
   Future<void> logout() async {
     try {
-      await _apiService.post('/user/logout', {});
+      await ApiService().post('/user/logout', {});
     } catch (e, stackTrace) {
       Log.e('🚨 [AuthApi] 登出失败: $e, $stackTrace');
     }

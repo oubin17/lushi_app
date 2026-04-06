@@ -9,12 +9,15 @@ import 'package:lushi_app/models/response/page_response.dart';
 import 'package:lushi_app/models/response/service_response.dart';
 
 class HomeResumeApi {
-  final ApiService _apiService = ApiService.instance;
+  static final HomeResumeApi _instance = HomeResumeApi._internal();
+
+  HomeResumeApi._internal();
+  factory HomeResumeApi() => _instance;
 
   /// 顶部数据汇总
   Future<ProjectInfoStatisticsResponse> getProjectInfoStatistics() async {
     try {
-      ServiceResponse response = await _apiService.get(
+      ServiceResponse response = await ApiService().get(
         '/project/info/statistic',
       );
 
@@ -45,7 +48,7 @@ class HomeResumeApi {
         sortField: 'updateTime',
         sortDirection: 'DESC',
       );
-      ServiceResponse response = await _apiService.post(
+      ServiceResponse response = await ApiService().post(
         '/project/info/list',
         pageRequest,
       );
@@ -74,7 +77,7 @@ class HomeResumeApi {
         sortField: 'in_time',
         sortDirection: 'DESC',
       );
-      ServiceResponse response = await _apiService.post(
+      ServiceResponse response = await ApiService().post(
         '/resume/private/list',
         pageRequest,
       );
@@ -97,7 +100,7 @@ class HomeResumeApi {
   /// 添加隐私简历
   Future<dynamic> privateResumeAdd(ResumeLibraryInfo resumeLibraryInfo) async {
     try {
-      ServiceResponse response = await _apiService.post(
+      ServiceResponse response = await ApiService().post(
         '/resume/private/add',
         resumeLibraryInfo.toJson(),
       );

@@ -10,7 +10,9 @@ import 'package:lushi_app/features/auth/data/models/userlogin_request.dart';
 import 'package:lushi_app/features/auth/data/models/userlogin_response.dart';
 
 class AuthService {
-  final AuthApi authApi = AuthApi();
+  static final AuthService _instance = AuthService._internal();
+  AuthService._internal();
+  factory AuthService() => _instance;
 
   /// 登录方法，返回用户 ID
   ///
@@ -21,7 +23,7 @@ class AuthService {
     request.identifyValue = await EncryptUtils.encrypt(request.identifyValue);
 
     // 拦截器已经统一处理了所有异常
-    UserLoginResponse? response = await authApi.login(request);
+    UserLoginResponse? response = await AuthApi().login(request);
     if (response == null) {
       Fluttertoast.showToast(
         msg: "登录失败，请检查密码",
@@ -57,7 +59,7 @@ class AuthService {
   /// - [AppException] - 网络错误或服务器业务错误，包含明确的错误类型和消息
   Future<void> logout() async {
     // 拦截器已经统一处理了所有异常
-    await authApi.logout();
+    await AuthApi().logout();
     //1.删除 token
     await SecureStorageManager().delete(StorageKey.token);
     //2.删除用户信息

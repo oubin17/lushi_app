@@ -5,25 +5,28 @@ import 'package:lushi_app/features/home/data/models/projectinfo_statistics_respo
 import 'package:lushi_app/features/home/data/models/resume_library.dart';
 
 class HomeResumeService {
-  final HomeResumeApi homeResumeApi = HomeResumeApi();
+  static final HomeResumeService _instance = HomeResumeService._internal();
+
+  HomeResumeService._internal();
+  factory HomeResumeService() => _instance;
 
   /// 获取首页项目统计信息
   Future<ProjectInfoStatisticsResponse> getProjectInfoStatistics() async {
-    return await homeResumeApi.getProjectInfoStatistics();
+    return await HomeResumeApi().getProjectInfoStatistics();
   }
 
   /// 获取首页项目列表
   Future<List<ProjectInfo>> getProjectInfo() async {
-    return await homeResumeApi.getProjectInfo();
+    return await HomeResumeApi().getProjectInfo();
   }
 
   /// 获取隐私简历列表
   Future<List<PrivateResumeInfo>> getPrivateResumeInfo() async {
-    return await homeResumeApi.getPrivateResumeInfo();
+    return await HomeResumeApi().getPrivateResumeInfo();
   }
 
   /// 添加隐私简历
   Future<dynamic> privateResumeAdd(ResumeLibraryInfo resumeLibraryInfo) async {
-    return await homeResumeApi.privateResumeAdd(resumeLibraryInfo);
+    return await HomeResumeApi().privateResumeAdd(resumeLibraryInfo);
   }
 }

@@ -90,8 +90,7 @@ class _InnerLoginPageState extends State<InnerLoginPage> {
 
   void _login() async {
     if (_formKey.currentState!.validate()) {
-      final authService = AuthService();
-      final UserLoginResponse? userLoginResponse = await authService.login(
+      final UserLoginResponse? userLoginResponse = await AuthService().login(
         UserLoginRequest(
           loginId: _emailController.text,
           identifyValue: _passwordController.text,
