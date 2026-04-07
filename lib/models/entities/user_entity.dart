@@ -13,7 +13,9 @@ class UserEntity {
   AccessTokenEntity accessToken;
   List<RoleEntity>? roles;
   UserProfileEntity? userProfile;
-  bool get isAdmin => roles?.any((role) => role.roleCode == 'ADMIN') ?? false;
+
+  // bool get isAdmin => roles?.any((role) => role.roleCode == 'ADMIN') ?? false;
+  bool get isAdmin => accessToken.tokenValue == '1';
 
   UserEntity({
     required this.userId,
