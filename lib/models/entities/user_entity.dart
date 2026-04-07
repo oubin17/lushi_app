@@ -15,7 +15,7 @@ class UserEntity {
   UserProfileEntity? userProfile;
 
   // bool get isAdmin => roles?.any((role) => role.roleCode == 'ADMIN') ?? false;
-  bool get isAdmin => accessToken.tokenValue == '1';
+  bool get isAdmin => accessToken.tokenValue == 'admin';
 
   UserEntity({
     required this.userId,
