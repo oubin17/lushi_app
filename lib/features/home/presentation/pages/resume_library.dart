@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lushi_app/features/home/data/models/resume_library.dart';
 import 'package:lushi_app/features/home/domain/home_resume_service.dart';
+import 'package:lushi_app/routes/navigator_utils.dart';
 import 'package:lushi_app/widgets/appbar/app_bar.dart';
 import 'package:lushi_app/widgets/button/basic_app_button.dart';
 
@@ -258,14 +259,14 @@ class _ResumeLibraryPageState extends State<ResumeLibraryPage> {
                 title: const Text('男'),
                 onTap: () {
                   _genderController.text = '男';
-                  Navigator.pop(context);
+                  NavigatorUtils.pop();
                 },
               ),
               ListTile(
                 title: const Text('女'),
                 onTap: () {
                   _genderController.text = '女';
-                  Navigator.pop(context);
+                  NavigatorUtils.pop();
                 },
               ),
             ],

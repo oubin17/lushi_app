@@ -3,9 +3,8 @@ import 'package:lushi_app/core/constants/system/system_constants.dart';
 import 'package:lushi_app/core/storage/secure_storage_manager.dart';
 import 'package:lushi_app/core/storage/storage_key.dart';
 import 'package:lushi_app/core/utils/log_utils.dart';
-import 'package:lushi_app/core/utils/navigator_utils.dart';
+import 'package:lushi_app/routes/navigator_utils.dart';
 import 'package:lushi_app/features/auth/domain/auth_service.dart';
-import 'package:lushi_app/features/splash/presentation/splash.dart';
 
 class RequestResponseInterceptor extends InterceptorsWrapper {
   @override
@@ -77,7 +76,7 @@ class RequestResponseInterceptor extends InterceptorsWrapper {
         // 1. 清除本地存储
         AuthService().afterLogout();
         // 2. 跳转欢迎页
-        NavigatorUtils.pushReplacementPage(const SplashPage());
+        NavigatorUtils.pushReplacementSplash();
       }
     }
   }

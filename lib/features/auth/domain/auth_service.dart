@@ -16,10 +16,10 @@ class AuthService {
   AuthService._internal();
   factory AuthService() => _instance;
 
-  /// 登录方法，返回用户 ID
-  ///
-  /// 异常处理说明:
-  /// - [AppException] - 网络错误或服务器业务错误，包含明确的错误类型和消息
+  // 登录状态（默认未登录）
+  bool isLoggedIn = false;
+
+  /// 登录
   Future<UserEntity?> login(UserLoginRequest request) async {
     // 直接调用 API，让异常自然向上传递
     request.identifyValue = await EncryptUtils.encrypt(request.identifyValue);
@@ -41,6 +41,7 @@ class AuthService {
         StorageKey.userInfo,
         jsonEncode(userEntity.toJson()),
       );
+      isLoggedIn = true;
 
       // await StorageManager().setJson(StorageKey.userInfo, response.toJson());
       return userEntity;
@@ -54,30 +55,23 @@ class AuthService {
   Future<void> logout() async {
     // 拦截器已经统一处理了所有异常
     await AuthApi().logout();
-
     await afterLogout();
-    //1.删除 token
-    // await SecureStorageManager().deleteAll();
-    // await SecureStorageManager().delete(StorageKey.token);
-    //2.删除用户信息
-    // await StorageManager().remove(StorageKey.userInfo);
-    //3.删除本地缓存
-    // await StorageManager().clear();
   }
 
   /// 登出后需要执行的操作，清除 storage 中的所有数据
   Future<void> afterLogout() async {
+    isLoggedIn = false;
     await SecureStorageManager().deleteAll();
     await StorageManager().clear();
   }
 
   /// 检查用户是否已登录
-  Future<bool> isLoggedIn() async {
+  Future<bool> checkLoggedIn() async {
     // 读取加密存储中的 token
     final token = await SecureStorageManager().read(StorageKey.token);
     // 不为空且不为空字符串，说明已登录
     if (token == null || token.isEmpty) return false;
-    await AuthApi().validateToken();
+    // await AuthApi().validateToken();
     return true;
   }
 

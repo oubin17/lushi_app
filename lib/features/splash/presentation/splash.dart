@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lushi_app/core/constants/images/app_images.dart';
 import 'package:lushi_app/features/auth/domain/auth_service.dart';
-import 'package:lushi_app/features/auth/presentation/login_or_regist.dart';
-import 'package:lushi_app/features/home/presentation/home.dart';
+import 'package:lushi_app/routes/navigator_utils.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -12,10 +12,22 @@ class SplashPage extends StatefulWidget {
 }
 
 class _SplashPageState extends State<SplashPage> {
+  bool fromOtherPage = false;
+  // 防止重复执行跳转
+  bool _isRedirected = false;
+
   @override
-  void initState() {
-    super.initState();
-    _redirect();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // 上下文已就绪，安全获取路由参数
+    final params = GoRouterState.of(context).uri.queryParameters;
+    fromOtherPage = params['fromOtherPage'] == 'true';
+
+    // 只执行一次跳转
+    if (!_isRedirected) {
+      _isRedirected = true;
+      _redirect(fromOtherPage);
+    }
   }
 
   @override
@@ -33,22 +45,20 @@ class _SplashPageState extends State<SplashPage> {
   }
 
   Future<bool> _checkAutoLogin() async {
-    return await AuthService().isLoggedIn();
+    return await AuthService().checkLoggedIn();
   }
 
-  Future<void> _redirect() async {
+  Future<void> _redirect(bool fromOtherPage) async {
     await Future.delayed(const Duration(seconds: 2));
+    if (fromOtherPage) {
+      NavigatorUtils.go('/login');
+      return;
+    }
     final isLogged = await _checkAutoLogin();
     if (isLogged) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const HomePage()),
-      );
+      NavigatorUtils.go('/home');
     } else {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const LoginOrRegistPage()),
-      );
+      NavigatorUtils.go('/login');
     }
   }
 }

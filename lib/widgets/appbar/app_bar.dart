@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:lushi_app/routes/navigator_utils.dart';
 
 class BasicAppbar extends StatelessWidget implements PreferredSizeWidget {
   final Widget? title;
@@ -11,9 +13,9 @@ class BasicAppbar extends StatelessWidget implements PreferredSizeWidget {
       elevation: 0,
       centerTitle: true,
       title: title ?? const Text(''),
-      leading: Navigator.canPop(context)
+      leading: context.canPop()
           ? IconButton(
-              onPressed: () => {Navigator.pop(context)},
+              onPressed: () => {NavigatorUtils.pop()},
               icon: Container(
                 height: 50,
                 width: 50,

@@ -3,8 +3,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:lushi_app/core/constants/images/app_images.dart';
 import 'package:lushi_app/features/auth/data/models/userlogin_request.dart';
 import 'package:lushi_app/features/auth/domain/auth_service.dart';
-import 'package:lushi_app/features/home/presentation/home.dart';
 import 'package:lushi_app/models/entities/user_entity.dart';
+import 'package:lushi_app/routes/navigator_utils.dart';
 import 'package:lushi_app/widgets/appbar/app_bar.dart';
 import 'package:lushi_app/widgets/button/basic_app_button.dart';
 
@@ -40,10 +40,12 @@ class _InnerLoginPageState extends State<InnerLoginPage> {
       ),
       body: Stack(
         children: [
-          SvgPicture.asset(
-            AppImages.logoBg,
-            width: double.infinity,
-            height: double.infinity,
+          Center(
+            child: SvgPicture.asset(
+              AppImages.logoBg,
+              width: double.infinity,
+              height: double.infinity,
+            ),
           ),
           // 背景图片
           // Image.asset(
@@ -62,7 +64,6 @@ class _InnerLoginPageState extends State<InnerLoginPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // _registerText(),
                   const SizedBox(height: 20),
                   _emailField(context),
                   const SizedBox(height: 20),
@@ -98,23 +99,9 @@ class _InnerLoginPageState extends State<InnerLoginPage> {
       );
       if (userEntity != null) {
         // 登录成功，导航到首页
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-            builder: (BuildContext context) => const HomePage(),
-          ),
-          (Route<dynamic> route) => false,
-        );
+        NavigatorUtils.go('/home');
       }
     }
-  }
-
-  Widget _registerText() {
-    return const Text(
-      "用户登录",
-      style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-      textAlign: TextAlign.center,
-    );
   }
 
   Widget _emailField(BuildContext context) {
@@ -152,6 +139,6 @@ class _InnerLoginPageState extends State<InnerLoginPage> {
   }
 
   Widget _registerButton() {
-    return BasicAppButton(onPressed: _login, title: '登录');
+    return BasicAppButton(onPressed: () => _login(), title: '登录');
   }
 }

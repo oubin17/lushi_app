@@ -9,6 +9,14 @@ import 'package:lushi_app/features/home/data/models/private_resume.dart';
 import 'package:lushi_app/features/home/data/models/private_resume_status.dart';
 import 'package:lushi_app/features/home/domain/home_resume_service.dart';
 import 'package:lushi_app/models/entities/user_entity.dart';
+import 'package:lushi_app/widgets/futurebuilder/common_future_builder.dart';
+
+class PrivateResumeData {
+  final List<PrivateResumeInfo> resumeList;
+  final UserEntity user;
+
+  PrivateResumeData({required this.resumeList, required this.user});
+}
 
 class PrivateResumeTableWidget extends StatefulWidget {
   const PrivateResumeTableWidget({super.key});
@@ -19,22 +27,7 @@ class PrivateResumeTableWidget extends StatefulWidget {
 }
 
 class _PrivateResumeTableWidgetState extends State<PrivateResumeTableWidget> {
-  List<PrivateResumeInfo>? privateResumeInfoList;
-
-  UserEntity? _user;
-
-  // 加载状态
-  bool _isLoading = true;
-
-  // 1. 添加一个 ScrollController (可选，但推荐用于复杂列表)
   final ScrollController _scrollController = ScrollController();
-
-  @override
-  void initState() {
-    super.initState();
-    _getPrivateResumeInfo();
-    _loadData();
-  }
 
   @override
   void dispose() {
@@ -42,71 +35,80 @@ class _PrivateResumeTableWidgetState extends State<PrivateResumeTableWidget> {
     super.dispose();
   }
 
-  /// 获取隐私简历列表
-  Future<void> _getPrivateResumeInfo() async {
-    // 模拟网络延迟
-    await Future.delayed(const Duration(seconds: 1));
-
+  /// 🔥 核心：合并两个异步请求（简历列表 + 用户信息）
+  Future<PrivateResumeData> _fetchAllData() async {
     try {
-      // 这里调用你的 Service
-      privateResumeInfoList = await HomeResumeService().getPrivateResumeInfo();
+      // 同时发起两个请求，并发执行
+      final results = await Future.wait([
+        HomeResumeService().getPrivateResumeInfo(),
+        _loadUserData(),
+      ]);
+
+      return PrivateResumeData(
+        resumeList: results[0] as List<PrivateResumeInfo>,
+        user: results[1] as UserEntity,
+      );
     } catch (e) {
-      // 处理错误
-    } finally {
-      // 无论成功失败，都结束加载状态
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+      Log.e('加载数据失败: $e');
+      rethrow;
     }
   }
 
-  Future<void> _loadData() async {
+  /// 加载用户信息（安全判空，修复强制!解包）
+  Future<UserEntity?> _loadUserData() async {
     try {
       final String? userInfo = await SecureStorageManager().read(
         StorageKey.userInfo,
       );
-      _user = UserEntity.fromJson(jsonDecode(userInfo!));
-      // 数据加载完成后更新 UI
-      setState(() {});
+      if (userInfo == null || userInfo.isEmpty) return null;
+      return UserEntity.fromJson(jsonDecode(userInfo));
     } catch (e) {
-      // 错误处理
       Log.e('读取用户信息失败: $e');
+      return null;
     }
   }
 
-  /// 下拉刷新触发的方法
+  /// 下拉刷新：极简实现（触发重建=重新请求数据）
   Future<void> _onRefresh() async {
-    // 重置状态
-    setState(() {
-      _isLoading = true;
-    });
-    // 重新获取数据
-    await _getPrivateResumeInfo();
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
       onRefresh: _onRefresh,
-      child: _isLoading && (privateResumeInfoList?.isEmpty ?? true)
-          ? const Center(child: CircularProgressIndicator()) // 首次加载时的空状态
-          : ListView.builder(
-              controller: _scrollController, // 绑定控制器
-              itemCount: privateResumeInfoList?.length ?? 0,
-              itemBuilder: (context, index) {
-                final privateResumeInfo = privateResumeInfoList![index];
-                return PrivateResumeTableRowWidget(
-                  user: _user,
-                  privateResumeInfo: privateResumeInfo,
-                );
-              },
-            ),
+      color: Colors.blue,
+      // 🔥 使用通用组件，自动管理所有状态
+      child: CommonFutureBuilder<PrivateResumeData>(
+        future: _fetchAllData(),
+        onSuccess: (data) => _buildContent(data),
+      ),
+    );
+  }
+
+  /// 数据加载成功后渲染列表
+  Widget _buildContent(PrivateResumeData data) {
+    // 空数据提示
+    if (data.resumeList.isEmpty) {
+      return const Center(child: Text("暂无隐私简历数据"));
+    }
+
+    return ListView.builder(
+      controller: _scrollController,
+      physics: const AlwaysScrollableScrollPhysics(), // 保证下拉刷新可用
+      itemCount: data.resumeList.length,
+      itemBuilder: (context, index) {
+        final item = data.resumeList[index];
+        return PrivateResumeTableRowWidget(
+          user: data.user,
+          privateResumeInfo: item,
+        );
+      },
     );
   }
 }
 
+// ====================== 子组件（无修改，仅保留） ======================
 class PrivateResumeTableRowWidget extends StatelessWidget {
   const PrivateResumeTableRowWidget({
     super.key,
@@ -120,7 +122,7 @@ class PrivateResumeTableRowWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       leading: CircleAvatar(
         radius: 28,
         backgroundImage: AssetImage(
@@ -129,15 +131,11 @@ class PrivateResumeTableRowWidget extends StatelessWidget {
               : AppImages.woman,
         ),
       ),
-
-      // --- 视觉优化 ---
-      // 让点击时的水波纹变成圆角，且选中时有背景色
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(5),
-        side: BorderSide(color: Colors.grey[200]!), // 底部边框分割线
+        side: BorderSide(color: Colors.grey[200]!),
       ),
-      selectedTileColor: Colors.blue[50], // 点击或选中时的背景色
-
+      selectedTileColor: Colors.blue[50],
       title: Text(
         privateResumeInfo.resumeLibraryDTO?.name ?? '',
         style: const TextStyle(fontWeight: FontWeight.bold),
@@ -150,22 +148,19 @@ class PrivateResumeTableRowWidget extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           user?.isAdmin == true
-              ?
-                // 员工名称
-                Text(
-                  "员工："
-                  "${privateResumeInfo.userName ?? ''}",
+              ? Text(
+                  "员工：${privateResumeInfo.userName ?? ''}",
                   style: const TextStyle(fontSize: 14, color: Colors.grey),
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                 )
-              : Container(),
+              : const SizedBox(),
         ],
       ),
       trailing: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: const Color.fromARGB(255, 225, 223, 223), // 给状态加个底色
+          color: const Color.fromARGB(255, 225, 223, 223),
           borderRadius: BorderRadius.circular(4),
         ),
         child: Text(
@@ -174,9 +169,7 @@ class PrivateResumeTableRowWidget extends StatelessWidget {
               '',
           style: TextStyle(
             fontSize: 12,
-
             color:
-                // const Color.fromARGB(255, 235, 11, 33),
                 PrivateResumeStatus.privateResumeStatusMap[privateResumeInfo
                         .status] ==
                     '有意向'
@@ -185,22 +178,16 @@ class PrivateResumeTableRowWidget extends StatelessWidget {
           ),
         ),
       ),
-
-      onTap: () {
-        // 点击事件
-        _showUserDetailDialog(context, privateResumeInfo);
-      },
+      onTap: () => _showUserDetailDialog(context, privateResumeInfo),
     );
   }
 
-  // 核心方法：显示详情弹窗
+  // 显示详情弹窗
   void _showUserDetailDialog(BuildContext context, PrivateResumeInfo user) {
     showDialog(
       context: context,
-      // barrierDismissible: true, // 默认为 true，点击弹窗外部区域即可关闭
       builder: (BuildContext context) {
         return AlertDialog(
-          // 1. 标题区域
           title: Row(
             children: [
               const Icon(Icons.account_circle, color: Colors.blue, size: 30),
@@ -209,7 +196,6 @@ class PrivateResumeTableRowWidget extends StatelessWidget {
             ],
           ),
           content: SingleChildScrollView(
-            // 防止内容过多溢出
             child: ListBody(
               children: <Widget>[
                 _buildDetailRow(
@@ -258,28 +244,12 @@ class PrivateResumeTableRowWidget extends StatelessWidget {
               ],
             ),
           ),
-          // 2. 底部按钮区域
-          actions: <Widget>[
-            // TextButton(
-            //   child: const Text("关闭"),
-            //   onPressed: () {
-            //     Navigator.of(context).pop(); // 关闭弹窗
-            //   },
-            // ),
-            // TextButton(
-            //   child: const Text("编辑", style: TextStyle(color: Colors.blue)),
-            //   onPressed: () {
-            //     Navigator.of(context).pop();
-            //     // 这里可以跳转编辑页面
-            //   },
-            // ),
-          ],
         );
       },
     );
   }
 
-  // 辅助方法：构建详情行
+  // 详情行组件
   Widget _buildDetailRow(IconData icon, String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),

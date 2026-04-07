@@ -1,103 +1,82 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lushi_app/core/constants/images/app_images.dart';
 import 'package:lushi_app/core/storage/secure_storage_manager.dart';
 import 'package:lushi_app/core/storage/storage_key.dart';
 import 'package:lushi_app/core/utils/log_utils.dart';
 import 'package:lushi_app/features/auth/domain/auth_service.dart';
-import 'package:lushi_app/features/splash/presentation/splash.dart';
 import 'package:lushi_app/models/entities/user_entity.dart';
+import 'package:lushi_app/widgets/futurebuilder/common_future_builder.dart';
 
-class ProfilePage extends StatefulWidget {
+class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
-  @override
-  State<ProfilePage> createState() => _ProfilePageState();
-}
-
-class _ProfilePageState extends State<ProfilePage> {
-  UserEntity? _user;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadData();
-  }
-
-  Future<void> _loadData() async {
+  /// 异步加载用户数据
+  Future<UserEntity?> _loadUserData() async {
     try {
       final String? userInfo = await SecureStorageManager().read(
         StorageKey.userInfo,
       );
-      _user = UserEntity.fromJson(jsonDecode(userInfo!));
-      // 数据加载完成后更新 UI
-      setState(() {});
+      if (userInfo == null || userInfo.isEmpty) return null;
+      return UserEntity.fromJson(jsonDecode(userInfo));
     } catch (e) {
-      // 错误处理
       Log.e('读取用户信息失败: $e');
+      return null;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      // 🔥 核心：使用通用组件，一行搞定异步渲染
+      body: CommonFutureBuilder<UserEntity?>(
+        future: _loadUserData(),
+        onSuccess: (user) => _buildPageContent(user!, context),
+      ),
+    );
+  }
+
+  /// 页面主内容（数据正常时渲染）
+  Widget _buildPageContent(UserEntity user, BuildContext context) {
     return SingleChildScrollView(
-      // 使用滚动视图，防止内容过多报错
       padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
           const SizedBox(height: 16),
-          // --- 卡片 1: 个人信息 ---
-          _buildInfoCard(_user!),
-
-          const SizedBox(height: 16), // 间距
-          // --- 卡片 2: 占位卡片 (待开发) ---
+          _buildInfoCard(user),
+          const SizedBox(height: 16),
           _buildPlaceholderCard("其他", "暂无数据"),
           const SizedBox(height: 16),
-          // --- 卡片 3: 退出登录 ---
-          _buildLogoutCard("退出登录", context),
+          _buildLogoutCard(context),
           const SizedBox(height: 16),
         ],
       ),
     );
   }
 
-  /// 构建个人信息卡片
+  /// 个人信息卡片
   Widget _buildInfoCard(UserEntity user) {
     return Card(
-      elevation: 2, // 阴影高度
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ), // 圆角
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
-            // 1. 头像部分
             CircleAvatar(
               radius: 45,
               backgroundColor: Colors.grey[200],
               backgroundImage: AssetImage(
                 user.isAdmin ? AppImages.adminBg : AppImages.employeeBg,
               ),
-              // child:
-              //     (user.userProfile == null ||
-              //         user.userProfile!.userName == null)
-              //     ? const Icon(Icons.person, size: 40, color: Colors.grey)
-              //     : null,
             ),
-
             const SizedBox(height: 16),
-
-            // 2. 姓名
             Text(
-              user.userProfile?.userName ?? "", // 这里可以换成 user.userName
+              user.userProfile?.userName ?? "未设置姓名",
               style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
-
             const SizedBox(height: 8),
-
-            // 3. 职位/角色标签
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               decoration: BoxDecoration(
@@ -110,9 +89,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 style: TextStyle(color: Colors.blue[700], fontSize: 12),
               ),
             ),
-
-            const Divider(height: 30), // 分割线
-            // 4. 详细信息列表 (工号、状态等)
+            const Divider(height: 30),
             _buildInfoRow(Icons.badge, "工号", user.accessToken.tokenValue),
             const SizedBox(height: 12),
             _buildInfoRow(
@@ -126,20 +103,20 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  /// 封装的一行信息组件 (图标 + 标题 + 内容)
+  /// 信息行组件
   Widget _buildInfoRow(IconData icon, String label, String value) {
     return Row(
       children: [
         Icon(icon, size: 20, color: Colors.grey[600]),
         const SizedBox(width: 12),
         Text(label, style: TextStyle(color: Colors.grey[600])),
-        const Spacer(), // 将内容推到右侧
+        const Spacer(),
         Text(value, style: const TextStyle(fontWeight: FontWeight.w500)),
       ],
     );
   }
 
-  /// 待定的卡片样式
+  /// 占位卡片
   Widget _buildPlaceholderCard(String title, String subtitle) {
     return Card(
       elevation: 2,
@@ -148,32 +125,21 @@ class _ProfilePageState extends State<ProfilePage> {
         title: Text(title),
         subtitle: Text(subtitle),
         trailing: const Icon(Icons.chevron_right),
-        onTap: () {
-          // 点击事件
-        },
       ),
     );
   }
 
-  Widget _buildLogoutCard(String title, BuildContext context) {
+  /// 退出登录卡片
+  Widget _buildLogoutCard(BuildContext context) {
     return Card(
       elevation: 2,
       child: ListTile(
-        leading: const Icon(Icons.logout),
-        title: Text(title),
+        leading: const Icon(Icons.logout, color: Colors.red),
+        title: const Text("退出登录", style: TextStyle(color: Colors.red)),
         trailing: const Icon(Icons.chevron_right),
-        onTap: () async {
-          // 点击事件
-          await AuthService().logout();
-          // 退出登录后，跳转到欢迎页
-
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(
-              builder: (BuildContext context) => const SplashPage(),
-            ),
-            (Route<dynamic> route) => false,
-          );
+        onTap: () {
+          AuthService().logout();
+          context.go('/?fromOtherPage=true');
         },
       ),
     );

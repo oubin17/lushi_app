@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lushi_app/core/storage/storage_manager.dart';
-import 'package:lushi_app/core/utils/navigator_utils.dart';
 import 'package:lushi_app/features/provider/data/model/counter_model.dart';
-import 'package:lushi_app/features/splash/presentation/splash.dart';
+import 'package:lushi_app/routes/app_router.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -25,15 +24,20 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      navigatorKey: NavigatorUtils.navigatorKey,
+    // return MaterialApp(
+    //   navigatorKey: NavigatorUtils.navigatorKey,
+    //   debugShowCheckedModeBanner: false,
+
+    //   home: const SplashPage(),
+    // );
+    return MaterialApp.router(
+      // 绑定路由配置
+      routerConfig: AppRouter.router,
+      // 关闭调试标识
       debugShowCheckedModeBanner: false,
-      // title: '禄仕人力管理系统',
-      // theme: ThemeData(
-      //   colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      //   useMaterial3: true,
-      // ),
-      home: const SplashPage(),
+
+      // 其他主题配置保留不变
+      // theme: ThemeData(primarySwatch: Colors.blue),
     );
   }
 }
