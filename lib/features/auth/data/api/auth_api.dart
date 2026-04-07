@@ -51,4 +51,14 @@ class AuthApi {
       rethrow;
     }
   }
+
+  /// 验证 token 是否有效
+  Future<void> validateToken() async {
+    try {
+      await ApiService().get('/system/validateToken');
+    } catch (e, stackTrace) {
+      Log.e('🚨 [AuthApi] 验证 token 是否有效: $e, $stackTrace');
+      rethrow;
+    }
+  }
 }

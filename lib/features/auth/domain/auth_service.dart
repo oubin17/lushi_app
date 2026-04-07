@@ -1,7 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:lushi_app/core/exceptions/app_exception.dart';
 import 'package:lushi_app/core/storage/secure_storage_manager.dart';
 import 'package:lushi_app/core/storage/storage_key.dart';
@@ -11,6 +9,7 @@ import 'package:lushi_app/features/auth/data/api/auth_api.dart';
 import 'package:lushi_app/features/auth/data/models/userlogin_request.dart';
 import 'package:lushi_app/features/auth/data/models/userlogin_response.dart';
 import 'package:lushi_app/models/entities/user_entity.dart';
+import 'package:lushi_app/widgets/toast/basic_toast.dart';
 
 class AuthService {
   static final AuthService _instance = AuthService._internal();
@@ -28,15 +27,7 @@ class AuthService {
     // 拦截器已经统一处理了所有异常
     UserLoginResponse? response = await AuthApi().login(request);
     if (response == null) {
-      Fluttertoast.showToast(
-        msg: "登录失败，请检查密码",
-        toastLength: Toast.LENGTH_SHORT, // 短提示
-        gravity: ToastGravity.CENTER, // 居中显示
-        timeInSecForIosWeb: 1, // iOS/Web 显示时长
-        backgroundColor: Colors.black54, // 背景色
-        textColor: Colors.white, // 文字颜色
-        fontSize: 16.0, // 字体大小
-      );
+      BasicToast.show("登录失败，请检查账号密码");
       return null;
     } else {
       //1.存储 token
@@ -74,6 +65,7 @@ class AuthService {
     // await StorageManager().clear();
   }
 
+  /// 登出后需要执行的操作，清除 storage 中的所有数据
   Future<void> afterLogout() async {
     await SecureStorageManager().deleteAll();
     await StorageManager().clear();
@@ -84,7 +76,9 @@ class AuthService {
     // 读取加密存储中的 token
     final token = await SecureStorageManager().read(StorageKey.token);
     // 不为空且不为空字符串，说明已登录
-    return token != null && token.isNotEmpty;
+    if (token == null || token.isEmpty) return false;
+    await AuthApi().validateToken();
+    return true;
   }
 
   /// 获取本地用户信息
